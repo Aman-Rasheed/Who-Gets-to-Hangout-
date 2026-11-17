@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Who gets to hangout?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light only;
+  /* palette: meadow green, mustard green, peach, olive, outerspace, crimson */
+  --cream:#FCF8F0; --paper:#F7EEDC; --peach:#F1D2A1; --ink:#0C3C24; --ink-2:#2B4C59;
+  --green:#0C3C24; --olive:#7B8B3D; --mustard:#B2BD47; --space:#2B4C59; --rust:#6B1A14; --orange:#6B1A14;
+  --serif:'DM Serif Display', Georgia, 'Times New Roman', serif;
+  --sans:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--cream);color:var(--ink);scroll-behavior:smooth}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;background:var(--cream);overflow-x:hidden}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ---------- hero ---------- */
+.hero{position:relative;height:100svh;min-height:640px;overflow:hidden;isolation:isolate}
+.hero-bg{position:absolute;inset:-4% 0 0 0;background:url(img/hero.webp) center bottom/cover no-repeat;z-index:-2;will-change:transform}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse 62% 50% at 50% 34%, rgba(255,253,248,.7), rgba(255,253,248,0) 72%)}
+.nav{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:26px clamp(20px,5vw,72px);z-index:5}
+.logo{font-family:var(--serif);font-size:19px;line-height:.98;letter-spacing:.005em;text-decoration:none;display:block}
+.nav ul{display:flex;gap:clamp(18px,3vw,44px);list-style:none}
+.nav ul a{font-size:12.5px;font-weight:500;letter-spacing:.08em;text-decoration:none}
+.nav ul a:hover{text-decoration:underline;text-underline-offset:4px}
+.hero-inner{position:absolute;left:50%;top:clamp(96px,12.5vh,150px);transform:translateX(-50%);width:min(760px,90vw);text-align:center}
+.eyebrow{font-size:11.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(52px,7.4vw,112px);line-height:.95;letter-spacing:-.015em;margin:16px 0 22px}
+.hero p.lede{font-size:clamp(13px,0.95vw,14.5px);line-height:1.62;max-width:560px;margin:0 auto;color:var(--ink)}
+.cta{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:28px;position:relative}
+.btn-pill{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--peach);border-radius:999px;padding:15px 28px;font-size:12.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;transition:background .2s, transform .2s}
+.btn-pill:hover{background:var(--olive);color:#fff;transform:translateY(-1px)}
+.btn-link{font-size:12.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;text-decoration:none;padding:4px 0;border-bottom:1.5px solid currentColor}
+.btn-link:hover{color:var(--rust)}
+.group-pop{position:absolute;bottom:calc(100% + 14px);left:50%;transform:translate(-50%,6px);width:min(320px,86vw);background:#FFFDF8;border:1.5px solid var(--ink);border-radius:14px;padding:18px 20px 16px;text-align:left;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;box-shadow:0 18px 40px -18px rgba(12,60,36,.45);z-index:10}
+.group-pop.open{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.group-pop h4{font-family:var(--serif);font-weight:400;font-size:24px;margin:6px 0 10px}
+.group-pop ul{list-style:none;font-size:14.5px;line-height:1.9}
+
+/* ---------- intro (scroll-faded text) ---------- */
+.intro{position:relative;background:var(--cream)}
+.intro-stage{position:sticky;top:0;height:100svh;overflow:hidden;background:var(--cream) var(--grain);display:grid;place-items:center}
+.slide{position:absolute;width:min(820px,88vw);text-align:center;visibility:hidden}
+.slide > *{will-change:opacity,transform,filter}
+.slide .eyebrow{color:var(--rust);margin-bottom:22px}
+.slide h2{font-family:var(--serif);font-weight:400;font-size:clamp(40px,5.4vw,78px);line-height:1;letter-spacing:-.01em;margin-bottom:24px}
+.slide p.body{font-size:clamp(16.5px,1.35vw,20px);line-height:1.62;max-width:640px;margin:0 auto;color:var(--ink-2)}
+.slide p.verbatim{font-family:var(--serif);font-size:clamp(20px,2.05vw,30px);line-height:1.38;color:var(--ink);text-align:left}
+.slide.quote{width:min(860px,88vw)}
+.slide h2.mid{font-size:clamp(30px,3.6vw,54px);line-height:1.12;max-width:900px;margin:0 auto}
+.intro-count{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font-size:11.5px;letter-spacing:.2em;color:var(--ink-2)}
+.intro-bar{position:absolute;bottom:0;left:0;height:3px;background:var(--olive);width:0}
+
+/* ---------- parks ---------- */
+.park{position:relative}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden;isolation:isolate}
+.stage .bg{position:absolute;inset:0;background:center bottom/cover no-repeat;will-change:transform;z-index:-2}
+.stage .veil{position:absolute;inset:0;background:var(--cream) var(--grain);z-index:6;pointer-events:none}
+.park-title{position:absolute;left:50%;top:50%;margin:0;translate:-50% -50%;width:92vw;text-align:center;z-index:7;will-change:opacity,transform}
+.park-title p{margin-left:auto;margin-right:auto}
+.park-title .eyebrow{color:var(--rust)}
+.park-title h2{white-space:nowrap;font-family:var(--serif);font-weight:400;font-size:clamp(46px,7vw,108px);line-height:.96;letter-spacing:-.015em;margin:14px 0 18px}
+.park-title p{font-size:clamp(15.5px,1.25vw,18.5px);line-height:1.6;color:var(--ink-2);max-width:560px}
+.park-title .hint{margin-top:26px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.park-label{position:absolute;top:clamp(18px,3.5vh,34px);left:clamp(20px,5vw,72px);z-index:5;opacity:0;font-family:var(--serif);font-size:clamp(28px,2.6vw,40px);line-height:1;letter-spacing:-.005em;
+  color:#FFFDF8;text-shadow:0 1px 2px rgba(8,30,18,.6),0 3px 18px rgba(8,30,18,.5)}
+
+.cut-zone{position:absolute;left:clamp(24px,11vw,200px);bottom:clamp(34px,5.5vh,60px);z-index:3;pointer-events:none}
+.cut{position:absolute;left:0;bottom:0;opacity:0;transform-origin:50% 100%;transform:translate3d(0,var(--cy,0px),0) rotate(var(--r));will-change:opacity,transform}
+.cut-img{display:block;width:auto;height:auto;max-height:min(52vh,560px);max-width:min(44vw,620px);filter:drop-shadow(3px 7px 6px rgba(40,30,10,.32))}
+@media (max-width:760px){.cut-img{max-height:34vh;max-width:88vw}}
+.cutout-svg{display:block;overflow:visible;filter:drop-shadow(3px 7px 6px rgba(40,30,10,.32))}
+
+.card-zone{position:absolute;right:clamp(16px,5vw,88px);top:50%;width:min(380px,32vw);height:0;z-index:4}
+.card{position:absolute;left:0;right:0;top:0;transform:translate3d(0,calc(-50% + var(--y,120vh)),0);visibility:hidden;background:#FFFDF8;border-radius:16px;padding:12px 12px 20px;border-top:4px solid var(--mustard);box-shadow:0 24px 50px -22px rgba(12,60,36,.5), 0 2px 0 rgba(12,60,36,.08);will-change:transform}
+.card .ph{aspect-ratio:4/3;border-radius:9px;background-repeat:no-repeat;background-size:330%;position:relative;overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.card .ph .tag{position:absolute;left:10px;bottom:10px;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:rgba(251,243,225,.9);padding:5px 9px;border-radius:999px}
+.card .meta{display:flex;justify-content:space-between;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--rust);margin:16px 8px 8px}
+.card h3{font-family:var(--serif);font-weight:400;font-size:clamp(24px,2vw,30px);line-height:1.08;margin:0 8px 8px}
+.card p{font-size:15px;line-height:1.55;color:var(--ink-2);margin:0 8px}
+.park-label{isolation:isolate;white-space:nowrap}
+.park-label::before{content:"";position:absolute;z-index:-1;pointer-events:none;left:-140px;top:-90px;width:calc(100% + 460px);height:300px;
+  background:radial-gradient(ellipse 62% 72% at 22% 32%, rgba(0,0,0,.66) 0%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.18) 72%, rgba(0,0,0,0) 100%)}
+.credit{position:absolute;left:clamp(12px,1.6vw,24px);bottom:10px;z-index:5;font-size:10px;line-height:1.35;color:#FFFDF8;text-shadow:0 1px 3px rgba(8,30,18,.85);opacity:0;max-width:min(560px,60vw);overflow-wrap:anywhere}
+.credit a{text-decoration:underline;text-underline-offset:2px}
+.dots{position:absolute;right:clamp(16px,5vw,88px);bottom:28px;display:flex;gap:7px;z-index:4;opacity:0;transition:opacity .3s}
+.dots i{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--ink);background:rgba(255,253,248,.75);transition:background .3s, transform .3s}
+.dots i.on{background:var(--mustard);transform:scale(1.15)}
+
+/* ---------- end ---------- */
+.end{position:relative;isolation:isolate;min-height:100svh;background:#0C3C24;display:grid;place-items:center;text-align:center;padding:16vh 6vw;overflow:hidden;color:#FFFDF8}
+.end::before{content:"";position:absolute;inset:-60px;background:url(img/photo-cubbon.jpg) center 70%/cover no-repeat;filter:blur(26px) saturate(1.1);transform:scale(1.08);z-index:-2}
+.end::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse 70% 60% at 50% 48%, rgba(8,41,26,.35), rgba(8,41,26,.7) 100%), var(--grain)}
+/* title card: letterbox bars slide in, lines fade up one after another */
+.end .bar{position:absolute;left:0;right:0;height:9vh;background:#08291A;transform:scaleY(0);transition:transform 1.1s cubic-bezier(.7,0,.2,1)}
+.end .bar.t{top:0;transform-origin:top}.end .bar.b{bottom:0;transform-origin:bottom}
+.end.on .bar{transform:scaleY(1)}
+.end .rv{opacity:0;transform:translateY(14px);filter:blur(5px);transition:opacity 1.3s ease,transform 1.3s ease,filter 1.3s ease;transition-delay:calc(var(--d,0) * 1s + .5s)}
+.end.on .rv{opacity:1;transform:none;filter:none}
+.end .presents{font-size:12px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--rust);padding-left:.42em}
+.end .film{color:#FFFDF8;text-shadow:0 2px 30px rgba(8,30,18,.45);font-family:var(--serif);font-weight:400;font-size:clamp(46px,7vw,110px);line-height:.98;letter-spacing:-.01em;margin:22px 0 14px}
+.end .tag{font-family:var(--serif);font-style:italic;font-size:clamp(16px,1.4vw,20px);color:var(--ink-2)}
+.end .rule{width:64px;height:1.5px;background:var(--mustard);margin:44px auto 34px}
+.end .by{color:var(--peach);font-family:var(--serif);font-style:italic;font-size:clamp(24px,2.4vw,34px);margin-bottom:26px}
+.end ul{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:14px 14px;max-width:760px;margin:0 auto}
+/* name tiles: colour floods in from the cursor, tile grows with a little wobble */
+.end li{position:relative;isolation:isolate;overflow:hidden;font-size:15.5px;border:1.5px solid rgba(255,253,248,.6);background:rgba(255,253,248,.1);border-radius:999px;padding:10px 20px;cursor:default;color:#FFFDF8;
+  transition:color .12s ease,border-color .12s ease,background-color 0s,box-shadow .4s ease,transform .5s cubic-bezier(.34,1.5,.6,1),filter .3s ease,opacity .3s ease}
+.end li::before{content:"";position:absolute;inset:-3px;background:var(--c);transform:scaleX(0);transform-origin:right center;transition:transform .12s ease-out;z-index:-1}
+.end li:hover::before,.end li:focus-visible::before{transform-origin:left center}
+.end li:hover,.end li:focus-visible{color:var(--fg);border-color:rgba(255,253,248,.9);background-color:var(--c);transition-delay:0s,0s,.12s,0s,0s,0s,0s;box-shadow:0 14px 26px -12px var(--c);animation:wobble .7s cubic-bezier(.3,1.4,.5,1) forwards;outline:none;z-index:2}
+.end li:hover::before,.end li:focus-visible::before{transform:scale(1)}
+.end.on ul:hover li:not(:hover),.end.on ul:focus-within li:not(:focus-visible){filter:blur(1.6px);opacity:.85}
+.end li{opacity:0}
+.end.on li{opacity:1;animation:rise 1.3s ease calc(var(--d,0) * 1s + .5s) backwards}
+.end.on li.shown{animation:none}
+.end.on li:hover,.end.on li:focus-visible{animation:wobble .7s cubic-bezier(.3,1.4,.5,1) forwards}
+@keyframes rise{from{opacity:0;transform:translateY(14px);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+@keyframes wobble{0%{transform:scale(1) rotate(0)}25%{transform:scale(1.26) rotate(-5deg)}50%{transform:scale(1.14) rotate(3.5deg)}72%{transform:scale(1.22) rotate(-1.6deg)}100%{transform:scale(1.18) rotate(var(--tilt,1deg))}}
+.end .meta{margin-top:40px;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-2)}
+.end .top{display:inline-block;margin-top:48px;color:#FFFDF8}
+.end .top:hover{color:var(--peach)}
+@media (prefers-reduced-motion: reduce){.end li:hover,.end li:focus-visible{animation:none;transform:scale(1.12)}}
+
+@media (max-width: 760px){
+  .cut-zone{left:6vw}
+  .nav ul{display:none}
+  .logo{font-size:17px}
+  .hero-inner{top:96px}
+  .cta{flex-direction:column;gap:18px}
+  .card-zone{left:4vw;right:4vw;width:auto;top:84px}
+  .card{transform:translate3d(0,var(--y,120vh),0);padding:10px 10px 16px}
+  .card .ph{aspect-ratio:16/8}
+  .card h3{font-size:23px}
+  .card p{font-size:14px}
+  .dots{left:0;right:0;justify-content:center;bottom:12px}
+  .slide p.verbatim{font-size:18.5px}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<!--DEFS-->
+
+<section class="hero" id="top">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <nav class="nav" aria-label="Sections">
+    <a class="logo" href="#top" aria-label="Exploring Bangalore">Exploring<br>Bangalore</a>
+    <ul>
+      <li><a href="#intro">THE IDEA.</a></li>
+      <li><a href="#parks">THE PARKS.</a></li>
+      <li><a href="#end">THE GROUP.</a></li>
+    </ul>
+  </nav>
+  <div class="hero-inner">
+    <p class="eyebrow">Parks as a third space in Bangalore</p>
+    <h1>Who gets to hangout?</h1>
+    <p class="lede">Parks—spaces where, by the virtue of its nature, we immediately understand that it’s a place where everyone is allowed. As soon as we put “Parks” and “Bangalore” in the same sentence, a bunch of names come up—Cubbon Park, Lal Bagh, Freedom Park—to name a few of the lot. For a space we think of as something open for all, we do notice diversity amongst the population, which varies from park to park. This sets us up for a question: Who gets to hang out?</p>
+    <div class="cta">
+      <button class="btn-pill" id="groupBtn" aria-expanded="false" aria-controls="groupPop">Group 4 <span aria-hidden="true">↗</span></button>
+      <a class="btn-link" href="#intro">Scroll to know more <span aria-hidden="true">↓</span></a>
+      <div class="group-pop" id="groupPop" role="dialog" aria-label="Group 4 members">
+        <p class="eyebrow" style="color:var(--rust)">Group 4</p>
+        <h4>Who made this</h4>
+        <ul>
+          <li>Vyshnavi S</li><li>Risha Vaidya</li><li>Samiksha Bhowmik</li><li>Aryamaan Rana</li><li>Samyukth M</li><li>Aman Rasheed</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="intro fade-sec" id="intro">
+  <div class="intro-stage">
+    <div class="slide">
+      <p class="eyebrow">A brief history · before the 1800s</p>
+      <h2>Gardens before parks</h2>
+      <p class="body">Long before Bangalore had official parks, the land was covered in kitchen gardens planted for food. In the 1700s, Hyder Ali and his son Tipu Sultan laid out the city’s first landscaped gardens.</p>
+    </div>
+    <div class="slide">
+      <p class="eyebrow">A brief history · after 1799</p>
+      <h2>A place to spend time</h2>
+      <p class="body">After the British defeated Tipu Sultan and took over the city, Lalbagh became a horticultural hub, and an annual flower show soon followed. British officials and local residents came to see it. Green space was no longer only for growing food; people went there to spend time.</p>
+    </div>
+    <div class="slide">
+      <p class="eyebrow">A brief history · today</p>
+      <h2>More parks, less green</h2>
+      <p class="body">The IT boom brought more people and denser building. Green cover fell even as the number of parks grew. The BBMP now lists over 1,200 neighbourhood parks covering about 2 sq km, most with concrete walks, play areas and exercise zones for senior citizens.</p>
+    </div>
+    <div class="slide quote">
+      <p class="eyebrow">Third spaces</p>
+      <p class="verbatim">Hanging out requires you to occupy spaces. A truly enjoyable hangout, without any restrictions, happens in a space as open as the people. These spaces, as coined by sociologist Ray Oldenburg in his 1989 book The Great Good Place, are known as third spaces—a social environment separate from your home (the first place) and your workplace or school (the second place).</p>
+    </div>
+    <div class="slide quote">
+      <p class="eyebrow">Third spaces</p>
+      <p class="verbatim">These third spaces have been important places to hang out freely. Cafés, libraries, and pubs are great examples of these spaces. It gives people the freedom to exist without judgement. The everyday hangouts become easier with these spaces.</p>
+    </div>
+    <div class="slide quote">
+      <p class="eyebrow">Third spaces</p>
+      <p class="verbatim">Parks also serve as one of these third spaces. An open space to sit, talk, wind down, and be as you are. What sets it apart from other third spaces is that there are no limits to it. When it claims to be "open" it truly is. Cafés can be exclusive to those who have a certain income. Libraries are exclusive to the literate. Pubs, again, are exclusive in terms of age and social standing.</p>
+    </div>
+    <div class="slide">
+      <p class="eyebrow">Third spaces</p>
+      <h2>Parks, however, have none of that.</h2>
+    </div>
+    <div class="slide quote">
+      <p class="eyebrow">The coffee house and the ashram</p>
+      <p class="verbatim">In "The Coffee House and the Ashram: Gandhi, Civil Society and Public Spheres," by Susanne and Lloyd Rudolph, the authors compare the European concept of the “public sphere” to public life during Gandhi’s time in India. They contend that Gandhi’s ashram expanded the notion by incorporating daily life, spirituality, and common people into the public arena. While the European coffeehouses were highly exclusive, open to only those who were literate, Gandhi's Ashrams did not have such caveats.</p>
+    </div>
+    <div class="slide quote">
+      <p class="eyebrow">The coffee house and the ashram</p>
+      <p class="verbatim">Similarly, parks do not have any conditions attached to them. Just like Gandhi's Ashrams, they stay open to all individuals, creating a space where everyday life becomes a general happening within these spaces.</p>
+    </div>
+    <div class="slide quote">
+      <p class="eyebrow">The coffee house and the ashram</p>
+      <p class="verbatim">Besides the obvious, parks can also serve as political spaces—locations of resistance. Recent movements and gatherings in Freedom Park prove this. It is similar to how Gandhi used his Ashrams. "Ashrams are retreats for those who wish to join a community of dedication...in Gandhi’s case also to wider political interests and to social service—projects Gandhi regarded as paired," the authors quote in the essay.</p>
+    </div>
+    <div class="slide">
+      <p class="eyebrow">Field visits</p>
+      <h2>Six parks, and who we found in them</h2>
+      <p class="body">We visited parks across the city and noted who was using them, and how. Keep scrolling to walk through each one.</p>
+    </div>
+    <p class="intro-count" aria-hidden="true"></p>
+    <div class="intro-bar" aria-hidden="true"></div>
+  </div>
+</section>
+
+<div id="parks"></div>
+
+<section class="intro fade-sec" id="findings">
+  <div class="intro-stage">
+    <div class="slide">
+      <p class="eyebrow">What we found</p>
+      <h2>So, who gets to hang out? The question is, who doesn't?</h2>
+    </div>
+    <div class="slide quote">
+      <p class="eyebrow">What we found</p>
+      <p class="verbatim">Parks in Bengaluru have been social spaces for a while. If anyone wants to enter, they do so with no qualms. In all the parks we visited, not one of them felt closed off or like we weren't allowed; even the residential parks were inviting. The range of people we saw, from young kids to old groups, from a lone jogger to friends catching up, dog walkers to strays that found their way in, proves that the park gates never close. They stay open and welcoming.</p>
+    </div>
+    <div class="slide quote">
+      <p class="eyebrow">What we found</p>
+      <p class="verbatim">The lack of restrictions on who is "allowed" is one of the major reasons why parks are so loved. Accessibility is another. Parks give solitude to those who need it and community to others. It is an open space, ready to be moulded into whatever you need it to be.</p>
+    </div>
+    <div class="slide">
+      <p class="eyebrow">What we found</p>
+      <h2 class="mid">So the question isn't "Who gets to hang out" but rather "How do they hang out?" And for that, the possibilities are endless.</h2>
+    </div>
+    <p class="intro-count" aria-hidden="true"></p>
+    <div class="intro-bar" aria-hidden="true"></div>
+  </div>
+</section>
+
+<section class="end" id="end" aria-label="Credits">
+  <div class="bar t" aria-hidden="true"></div>
+  <div class="bar b" aria-hidden="true"></div>
+  <div>
+    <h2 class="film rv" style="--d:0">Who Gets to Hangout?</h2>
+    <div class="rule rv" style="--d:.7" aria-hidden="true"></div>
+    <p class="by rv" style="--d:1">a project by</p>
+    <ul>
+      <li tabindex="0" style="--c:#0C3C24;--fg:#FFFDF8;--tilt:-2deg;--d:1.40">Vyshnavi S</li>
+      <li tabindex="0" style="--c:#B2BD47;--fg:#0C3C24;--tilt:2deg;--d:1.58">Risha Vaidya</li>
+      <li tabindex="0" style="--c:#6B1A14;--fg:#F1D2A1;--tilt:-1.5deg;--d:1.76">Samiksha Bhowmik</li>
+      <li tabindex="0" style="--c:#F1D2A1;--fg:#0C3C24;--tilt:1.5deg;--d:1.94">Aman Rasheed</li>
+      <li tabindex="0" style="--c:#7B8B3D;--fg:#FFFDF8;--tilt:-2.5deg;--d:2.12">Samyukth M</li>
+      <li tabindex="0" style="--c:#2B4C59;--fg:#FFFDF8;--tilt:2.5deg;--d:2.30">Aryamaan Rana</li>
+    </ul>
+    <a class="btn-link top rv" style="--d:2.8" href="#top">Back to the top <span aria-hidden="true">↑</span></a>
+  </div>
+</section>
+
+<script>/* Paper-cutout characters: a tiny SVG rig that draws black-and-white
+   figures in different poses and views, plus props, on torn notebook paper. */
+(function () {
+  const K = '#161513', W = '#fbfaf5', LW = 2.3, D = Math.PI / 180;
+  const f2 = n => Math.round(n * 10) / 10;
+  const P = p => f2(p[0]) + ',' + f2(p[1]);
+  const add = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k];
+  const seg = (p, len, a) => [p[0] + len * Math.sin(a * D), p[1] + len * Math.cos(a * D)];
+  const fillOf = c => ({ k: K, w: W, stripe: 'url(#pt-stripe)', dots: 'url(#pt-dots)', check: 'url(#pt-check)', hatch: 'url(#pt-hatch)', vstripe: 'url(#pt-vstripe)' }[c] || c);
+
+  function limb(pts, w, fill) {
+    const d = 'M' + pts.map(P).join('L');
+    const f = fillOf(fill);
+    let s = `<path d="${d}" stroke="${K}" stroke-width="${f2(w + LW * 2)}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    if (f !== K) s += `<path d="${d}" stroke="${f}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    return s;
+  }
+  const poly = (pts, fill, extra = '') => `<path d="M${pts.map(P).join('L')}Z" fill="${fillOf(fill)}" stroke="${K}" stroke-width="${LW}" stroke-linejoin="round" ${extra}/>`;
+  const circle = (c, r, fill = W, sw = LW) => `<circle cx="${f2(c[0])}" cy="${f2(c[1])}" r="${r}" fill="${fillOf(fill)}" stroke="${K}" stroke-width="${sw}"/>`;
+  const line = (a, b, w = LW, cap = 'round') => `<path d="M${P(a)}L${P(b)}" stroke="${K}" stroke-width="${w}" stroke-linecap="${cap}" fill="none"/>`;
+
+  /* ---------- poses: [upper, lower] angles in degrees, 0 = straight down, + = toward screen-right ---------- */
+  const POSES = {
+    stand:     { aL: [8, 4], aR: [-8, -4], lL: [3, 0], lR: [-3, 0] },
+    standSide: { aL: [-6, 10], aR: [8, 18], lL: [-2, 0], lR: [3, 0] },
+    walk:      { lean: 3, aL: [28, 50], aR: [-24, -10], lL: [-18, -30], lR: [22, 6] },
+    walk2:     { lean: 3, aL: [-20, -6], aR: [24, 46], lL: [20, 4], lR: [-16, -34] },
+    run:       { lean: 10, aL: [-40, 50], aR: [50, 120], lL: [-30, -95], lR: [45, 10] },
+    armsCross: { aL: [12, 95], aR: [-12, -95], lL: [3, 0], lR: [-3, 0] },
+    hips:      { aL: [35, -30], aR: [-35, 30], lL: [5, 0], lR: [-5, 0] },
+    wave:      { aL: [8, 4], aR: [-150, -175], lL: [3, 0], lR: [-3, 0] },
+    armsUp:    { aL: [170, 178], aR: [-170, -178], lL: [2, 0], lR: [-2, 0] },
+    tree:      { aL: [165, 182], aR: [-165, -182], lL: [2, 0], lR: [-70, 30] },
+    phone:     { head: 2, aL: [-6, 165], aR: [6, -165], lL: [3, 0], lR: [-3, 0] },
+    phoneSide: { lean: 2, head: 6, aL: [12, 110], aR: [18, 120], lL: [-2, 0], lR: [3, 0] },
+    phoneWalk: { lean: 4, head: 8, aL: [14, 120], aR: [20, 125], lL: [-14, -24], lR: [18, 4] },
+    eat:       { aL: [-12, 140], aR: [-10, -170], lL: [3, 0], lR: [-3, 0] },
+    hold:      { aL: [-10, 160], aR: [10, -160], lL: [3, 0], lR: [-3, 0] },
+    holdSide:  { lean: 2, aL: [30, 95], aR: [36, 100], lL: [-3, 0], lR: [4, 0] },
+    point:     { aL: [8, 4], aR: [80, 95], lL: [-3, 0], lR: [4, 0] },
+    gesture:   { lean: 4, head: 4, aL: [40, 120], aR: [75, 140], lL: [-6, 0], lR: [8, 0] },
+    gesture2:  { lean: -2, aL: [-60, -130], aR: [20, 140], lL: [-4, 0], lR: [6, 0] },
+    shout:     { lean: 3, head: -6, aL: [150, 168], aR: [40, 120], lL: [-6, 0], lR: [8, 0] },
+    fist:      { aL: [10, 120], aR: [-165, -175], lL: [4, 0], lR: [-4, 0] },
+    sing:      { head: -4, aL: [10, 5], aR: [-30, -150], lL: [3, 0], lR: [-3, 0] },
+    feed:      { lean: 24, head: 8, aL: [30, 20], aR: [55, 35], lL: [-4, 0], lR: [6, 0] },
+    crouch:    { lean: 34, head: 10, aL: [60, 40], aR: [80, 60], lL: [100, -10], lR: [80, -30] },
+    sitBench:  { aL: [10, 70], aR: [14, 80], lL: [88, 2], lR: [92, -4] },
+    sitBenchB: { aL: [-6, 0], aR: [6, 0], lL: [8, 0], lR: [-8, 0] },
+    sitCross:  { aL: [25, 60], aR: [-25, -60], lL: [-78, 75], lR: [78, -75] },
+    sitCrossBook: { head: 6, aL: [-6, 160], aR: [6, -160], lL: [-78, 75], lR: [78, -75] },
+    sitOut:    { lean: -8, aL: [-30, -20], aR: [30, 60], lL: [88, 90], lR: [84, 88] },
+    sitKnees:  { lean: 8, aL: [40, 100], aR: [60, 100], lL: [120, 0], lR: [130, 10] },
+    jump:      { aL: [-150, -165], aR: [150, 165], lL: [-25, -35], lR: [25, 35] },
+    skate:     { lean: 18, aL: [-60, -40], aR: [70, 40], lL: [-28, -8], lR: [34, 14] },
+    bat:       { lean: 18, head: -10, aL: [55, 130], aR: [65, 140], lL: [-14, 4], lR: [28, -6] },
+    shoot:     { lean: -4, aL: [170, 175], aR: [160, 150], lL: [-10, -30], lR: [6, 20] },
+    stretch:   { lean: 0, aL: [10, 5], aR: [-110, -95], lL: [5, 0], lR: [-5, 0] },
+    gym:       { lean: 6, aL: [100, 85], aR: [110, 90], lL: [-10, -20], lR: [20, 0] },
+    camera:    { head: 4, aL: [40, 160], aR: [50, 165], lL: [-4, 0], lR: [5, 0] },
+    stick:     { lean: 8, head: 6, aL: [10, 4], aR: [28, 6], lL: [-8, -4], lR: [10, 2] },
+    kettle:    { aL: [8, 4], aR: [10, -150], lL: [3, 0], lR: [-3, 0] },
+    guitar:    { head: 6, aL: [30, 120], aR: [-20, -100], lL: [-78, 75], lR: [78, -75] },
+    swingSit:  { aL: [-170, -178], aR: [170, 178], lL: [70, 10], lR: [75, 20] },
+    picnic:    { lean: -6, aL: [-20, -10], aR: [30, 100], lL: [80, 10], lR: [-82, 92] },
+  };
+
+  const VIEW = {
+    front: { so: 11, ho: 6, tw: 15, bw: 12 },
+    back:  { so: 11, ho: 6, tw: 15, bw: 12 },
+    three: { so: 8, ho: 5, tw: 13, bw: 11 },
+    side:  { so: 1.5, ho: 1, tw: 10, bw: 10 },
+  };
+
+  function rig(f) {
+    const pz = Object.assign({}, POSES[f.pose] || POSES.stand, f.tweak || {});
+    const v = VIEW[f.view || 'front'];
+    const kid = !!f.kid;
+    const L = kid ? { torso: 31, thigh: 23, shin: 23, up: 18, fore: 17, R: 11.5, neck: 8 }
+                  : { torso: 50, thigh: 40, shin: 40, up: 31, fore: 29, R: 12.5, neck: 10 };
+    L.thigh *= (f.thighK || 1);
+    const lean = pz.lean || 0;
+    const H = [0, 0];
+    const up = [Math.sin(lean * D), -Math.cos(lean * D)];
+    const perp = [-up[1], up[0]];
+    const sb = add(H, up, L.torso - (kid ? 3 : 4));
+    const sc = kid ? 0.7 : 1;
+    const sL = add(sb, perp, -v.so * sc), sR = add(sb, perp, v.so * sc);
+    const hL = add(H, perp, -v.ho * sc), hR = add(H, perp, v.ho * sc);
+    const eL = seg(sL, L.up, pz.aL[0]), wL = seg(eL, L.fore, pz.aL[1]);
+    const eR = seg(sR, L.up, pz.aR[0]), wR = seg(eR, L.fore, pz.aR[1]);
+    const kL = seg(hL, L.thigh, pz.lL[0]), fL = seg(kL, L.shin, pz.lL[1]);
+    const kR = seg(hR, L.thigh, pz.lR[0]), fR = seg(kR, L.shin, pz.lR[1]);
+    const neck = add(H, up, L.torso);
+    const head = add(add(neck, up, L.neck + L.R * 0.55), [pz.head || 0, 0]);
+    return { pz, v, L, kid, sc, H, up, perp, sb, sL, sR, hL, hR, eL, wL, eR, wR, kL, fL, kR, fR, neck, head, lean };
+  }
+
+  /* ---------- heads ---------- */
+  function drawHead(f, r) {
+    const R = r.L.R, view = f.view || 'front';
+    const hc = f.hairC || 'k';
+    const hair = f.hair || 'short';
+    const off = { front: [0, 2.4], three: [2, 2.4], side: [3, 2.4], back: [0, 2.4] }[view];
+    let back = '', s = '';
+    const g = (inner) => `<g transform="translate(${f2(r.head[0])},${f2(r.head[1])}) rotate(${f2((r.pz.head || 0) * 1.2)})">${inner}</g>`;
+    if (hair === 'long' || hair === 'braid') {
+      if (view === 'back') s += `<path d="M${-R - 1},-2 Q${-R - 3},${R + 16} 0,${R + 18} Q${R + 3},${R + 16} ${R + 1},-2Z" fill="${fillOf(hc)}" stroke="${K}" stroke-width="${LW}"/>`;
+      else back += `<path d="M${-R - 2 + (view === 'side' ? -4 : 0)},-1 L${-R - 1},${R + 15} Q0,${R + 19} ${R + 1},${R + 15} L${R + 2},-1Z" fill="${fillOf(hc)}" stroke="${K}" stroke-width="${LW}"/>`;
+      if (hair === 'braid' && view !== 'back') back += `<path d="M${-R + 1},${R} q-3,8 0,16 q3,8 0,16" stroke="${K}" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+    }
+    if (hair === 'bun' || hair === 'whitebun') {
+      const bx = view === 'side' ? -R * 0.9 : view === 'three' ? -R * 0.5 : 0, by = view === 'side' ? -R * 0.5 : -R - 2;
+      back += `<circle cx="${bx}" cy="${by}" r="${R * 0.45}" fill="${hair === 'whitebun' ? W : fillOf(hc)}" stroke="${K}" stroke-width="${LW}"/>`;
+    }
+    if (hair === 'pony') {
+      const bx = view === 'front' ? R * 0.6 : -R * 0.9;
+      back += `<path d="M${bx},${-R * 0.5} q${-8},4 ${-6},${R + 10} q6,-4 ${10},${-R - 6}Z" fill="${fillOf(hc)}" stroke="${K}" stroke-width="${LW}"/>`;
+    }
+    // base (hair mass or bare head)
+    const bald = hair === 'bald';
+    const scarf = hair === 'scarf' || hair === 'scarfK';
+    if (scarf) {
+      const sf = hair === 'scarfK' ? K : W;
+      back += `<path d="M${-R - 3},${-2} Q${-R - 4},${-R - 4} 0,${-R - 4} Q${R + 4},${-R - 4} ${R + 3},-2 L${R + 6},${R + 10} Q0,${R + 16} ${-R - 6},${R + 10}Z" fill="${sf}" stroke="${K}" stroke-width="${LW}"/>`;
+    }
+    const white = hair === 'white' || hair === 'whitebun';
+    if (view === 'back') {
+      s += `<circle cx="0" cy="0" r="${R}" fill="${bald ? W : white ? W : scarf ? (hair === 'scarfK' ? K : W) : fillOf(hc)}" stroke="${K}" stroke-width="${LW}"/>`;
+      if (white) s += `<path d="M-6,-6 q3,-3 6,0 M1,-9 q3,-3 6,0 M-8,2 q3,-3 6,0" stroke="${K}" stroke-width="1.2" fill="none"/>`;
+      if (bald) s += `<path d="M${-R + 1},2 q-3,3 0,5 M${R - 1},2 q3,3 0,5" stroke="${K}" stroke-width="1.6" fill="none"/>`;
+      return { back, front: g(s) };
+    }
+    if (bald) {
+      s += `<circle cx="0" cy="0" r="${R}" fill="${W}" stroke="${K}" stroke-width="${LW}"/>`;
+      s += `<path d="M${-R + 0.5},${-2} q-2,3 0,6" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      if (view === 'front') s += `<path d="M${R - 0.5},${-2} q2,3 0,6" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+    } else if (scarf) {
+      s += `<ellipse cx="${off[0] * 0.6}" cy="2" rx="${R * 0.8}" ry="${R * 0.86}" fill="${W}" stroke="${K}" stroke-width="${LW}"/>`;
+    } else {
+      const base = white ? W : fillOf(hc);
+      if (hair === 'curly' || hair === 'afro') {
+        const n = 11, rr = hair === 'afro' ? R + 6 : R + 2.5;
+        let c = '';
+        for (let i = 0; i < n; i++) {
+          const a = Math.PI + (i / (n - 1)) * Math.PI * 1.15 - 0.1;
+          c += `<circle cx="${f2(Math.cos(a) * rr * 0.82 - off[0] * 0.5)}" cy="${f2(Math.sin(a) * rr * 0.8 - 2)}" r="${hair === 'afro' ? 6 : 4.4}" fill="${base}" stroke="${K}" stroke-width="${LW}"/>`;
+        }
+        s += c + `<circle cx="${-off[0] * 0.5}" cy="-2" r="${rr * 0.8}" fill="${base}"/>`;
+      } else {
+        s += `<circle cx="${f2(-off[0] * 0.4)}" cy="-1.8" r="${R + 0.6}" fill="${base}" stroke="${K}" stroke-width="${LW}"/>`;
+        if (white) s += `<path d="M-8,-8 q3,-3 6,0 M0,-11 q3,-3 6,0 M-11,-1 q2,-3 5,-1" stroke="${K}" stroke-width="1.2" fill="none"/>`;
+      }
+      // face
+      const fx = off[0], rx = R * (view === 'side' ? 0.74 : 0.82), ry = R * 0.84;
+      s += `<ellipse cx="${fx}" cy="${off[1]}" rx="${f2(rx)}" ry="${f2(ry)}" fill="${W}" stroke="${K}" stroke-width="${LW}"/>`;
+      // cover top seam with hair fringe so face reads as hairline
+      if (hair !== 'curly' && hair !== 'afro') {
+        const fr = view === 'side' ? `M${fx - rx},${off[1] - 2} Q${fx},${off[1] - ry - 3} ${fx + rx + 0.5},${off[1] - ry * 0.5}` :
+                   view === 'three' ? `M${fx - rx - 0.5},${off[1]} Q${fx - 2},${off[1] - ry - 2} ${fx + rx + 0.5},${off[1] - ry * 0.25}` :
+                   `M${-rx - 0.5},${off[1] - 1} Q0,${off[1] - ry - 5} ${rx + 0.5},${off[1] - 1} Q${rx * 0.4},${off[1] - ry * 0.55} 0,${off[1] - ry * 0.6} Q${-rx * 0.5},${off[1] - ry * 0.5} ${-rx - 0.5},${off[1] - 1}`;
+        s += `<path d="${fr}Z" fill="${base}" stroke="${K}" stroke-width="${LW}" stroke-linejoin="round"/>`;
+      }
+    }
+    // features
+    const ey = 3;
+    if (view === 'front') {
+      s += `<circle cx="-4" cy="${ey}" r="1.35" fill="${K}"/><circle cx="4" cy="${ey}" r="1.35" fill="${K}"/>`;
+      s += f.mouth === 'open' ? `<ellipse cx="0" cy="${ey + 5}" rx="2.2" ry="2.4" fill="${K}"/>` : `<path d="M-2.8,${ey + 4.5} Q0,${ey + 7} 2.8,${ey + 4.5}" stroke="${K}" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
+    } else if (view === 'three') {
+      s += `<circle cx="0.5" cy="${ey}" r="1.35" fill="${K}"/><circle cx="7" cy="${ey}" r="1.35" fill="${K}"/>`;
+      s += `<path d="M5,${ey + 0.5} l2.4,3.4 l-2.2,0.4" stroke="${K}" stroke-width="1.2" fill="none" stroke-linejoin="round"/>`;
+      s += f.mouth === 'open' ? `<ellipse cx="4.5" cy="${ey + 6.5}" rx="1.8" ry="2.2" fill="${K}"/>` : `<path d="M2,${ey + 6} Q4.5,${ey + 8} 7,${ey + 5.6}" stroke="${K}" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
+    } else {
+      s += `<circle cx="7" cy="${ey}" r="1.35" fill="${K}"/>`;
+      s += `<path d="M${R - 1.6},${ey - 1} l3,4.2 l-3,0.5" fill="${W}" stroke="${K}" stroke-width="${LW * 0.8}" stroke-linejoin="round"/>`;
+      s += f.mouth === 'open' ? `<ellipse cx="${R - 3}" cy="${ey + 7}" rx="1.6" ry="2" fill="${K}"/>` : `<path d="M${R - 5},${ey + 7} l3.5,-0.6" stroke="${K}" stroke-width="1.4" stroke-linecap="round"/>`;
+    }
+    const ex = view === 'front' ? [-4, 4] : view === 'three' ? [0.5, 7] : [7];
+    if (f.glasses) {
+      s += ex.map(x => `<circle cx="${x}" cy="${ey}" r="3.2" fill="none" stroke="${K}" stroke-width="1.5"/>`).join('');
+      if (ex.length === 2) s += `<path d="M${ex[0] + 3.2},${ey} L${ex[1] - 3.2},${ey}" stroke="${K}" stroke-width="1.3"/>`;
+      if (view === 'side') s += `<path d="M3.8,${ey} L-3,${ey - 1}" stroke="${K}" stroke-width="1.3"/>`;
+    }
+    if (f.shades) {
+      s += ex.map(x => `<ellipse cx="${x}" cy="${ey}" rx="3.6" ry="2.7" fill="${K}"/>`).join('');
+      if (ex.length === 2) s += `<path d="M${ex[0]},${ey} L${ex[1]},${ey}" stroke="${K}" stroke-width="1.4"/>`;
+    }
+    if (f.beard) {
+      const bx = view === 'front' ? 0 : view === 'three' ? 3 : 4;
+      const bw = view === 'side' ? 6 : 7.5;
+      s += `<path d="M${bx - bw},${ey + 4} Q${bx - bw + 1},${R + 6} ${bx},${R + 7} Q${bx + bw - 1},${R + 6} ${bx + bw},${ey + 4} Q${bx},${ey + 9} ${bx - bw},${ey + 4}Z" fill="${f.beard === 'w' ? W : K}" stroke="${K}" stroke-width="1.6"/>`;
+    }
+    if (f.moustache) {
+      const mx = view === 'front' ? 0 : view === 'three' ? 4.5 : R - 3.5;
+      s += `<path d="M${mx - 4},${ey + 5.4} q4,-3 8,0 q-4,1.4 -8,0Z" fill="${f.moustache === 'w' ? W : K}" stroke="${K}" stroke-width="1.2"/>`;
+    }
+    if (f.bindi && view !== 'side') s += `<circle cx="${view === 'front' ? 0 : 3.8}" cy="-1.5" r="1.1" fill="${K}"/>`;
+    if (f.cap) {
+      const dir = view === 'front' ? 0 : 1;
+      s += `<path d="M${-R - 0.5},-2 Q${-R},${-R - 3} 0,${-R - 3} Q${R},${-R - 3} ${R + 0.5},-2Z" fill="${fillOf(f.cap)}" stroke="${K}" stroke-width="${LW}"/>`;
+      s += dir ? `<path d="M${R - 2},-2.5 L${R + 9},-1 L${R + 8},1 L${R - 2},0.5Z" fill="${K}" stroke="${K}" stroke-width="1.5" stroke-linejoin="round"/>` : `<path d="M${-R + 1},-1.5 Q0,4 ${R - 1},-1.5" fill="${K}" stroke="${K}" stroke-width="2"/>`;
+    }
+    if (f.hat) {
+      s += `<path d="M${-R - 7},-4 L${R + 7},-4" stroke="${K}" stroke-width="3.2" stroke-linecap="round"/><path d="M${-R + 1},-4 Q${-R + 1},${-R - 8} 0,${-R - 8} Q${R - 1},${-R - 8} ${R - 1},-4Z" fill="${W}" stroke="${K}" stroke-width="${LW}"/><path d="M${-R + 1},-6 L${R - 1},-6" stroke="${K}" stroke-width="3"/>`;
+    }
+    if (f.helmet) {
+      s += `<path d="M${-R - 1.5},0 Q${-R - 1},${-R - 5} 0,${-R - 5} Q${R + 1},${-R - 5} ${R + 1.5},0Z" fill="${K}" stroke="${K}" stroke-width="${LW}"/><path d="M-3,${-R - 4} L-3,-1 M3,${-R - 4} L3,-1" stroke="${W}" stroke-width="1.4"/>`;
+    }
+    return { back: back ? g(back) : '', front: g(s) };
+  }
+
+  /* ---------- body ---------- */
+  function figure(f) {
+    const r = rig(f);
+    const view = f.view || 'front';
+    const top = f.top || 'w', bot = f.bottom || { t: 'pants', c: 'k' };
+    const skin = W;
+    const kid = r.kid;
+    const aw = kid ? 6 : 7.5, sleeveW = kid ? 8 : 10, legW = kid ? 9 : 12.5, skinLeg = kid ? 6.5 : 8;
+    const parts = { backProps: '', far: '', legs: '', torso: '', near: '', head: '', front: '' };
+
+    const arm = (s, e, w, side) => {
+      let o = limb([s, e, w], aw, skin);
+      if (f.sleeve === 'long' || f.sleeve === 'kurta') o = limb([s, e, w], sleeveW - 1, top) ;
+      else if (f.sleeve !== 'none') {
+        const mid = add(s, [e[0] - s[0], e[1] - s[1]], 0.62);
+        o += limb([s, mid], sleeveW, top);
+      }
+      o += circle(w, kid ? 2.9 : 3.5);
+      return o;
+    };
+    const leg = (h, k, ft, side) => {
+      let o = '';
+      const shoe = () => {
+        const fw = view === 'front' || view === 'back' ? 0 : 1;
+        if (f.barefoot) return circle(ft, 2.6);
+        if (fw) return `<path d="M${P(add(ft, [-2, 2]))}L${P(add(ft, [kid ? 7 : 10, 2]))}" stroke="${K}" stroke-width="${kid ? 6 : 7.5}" stroke-linecap="round"/>`;
+        return `<ellipse cx="${f2(ft[0] + (side < 0 ? -1.5 : 1.5))}" cy="${f2(ft[1] + 2.4)}" rx="${kid ? 4.6 : 6.4}" ry="${kid ? 3 : 3.6}" fill="${K}"/>`;
+      };
+      if (bot.t === 'shorts') {
+        o += limb([h, k, ft], skinLeg, skin) + limb([h, add(h, [k[0] - h[0], k[1] - h[1]], 0.62)], legW + 1, bot.c);
+      } else if (bot.t === 'skirt' || bot.t === 'saree' || bot.t === 'long') {
+        o += limb([h, k, ft], skinLeg, skin);
+      } else if (bot.t === 'dhoti') {
+        o += limb([h, k, add(k, [ft[0] - k[0], ft[1] - k[1]], 0.75)], legW + 1, bot.c) + limb([add(k, [ft[0] - k[0], ft[1] - k[1]], 0.7), ft], skinLeg - 1, skin);
+      } else {
+        o += limb([h, k, ft], legW, bot.c);
+      }
+      o += shoe();
+      if (f.skates) {
+        const fw = view === 'front' || view === 'back' ? 0 : 1;
+        const a = add(ft, [fw ? -4 : -6, 6]), b = add(ft, [fw ? 12 : 6, 6]);
+        o += line(a, b, 3) + circle(add(a, [1, 4]), 2.6, K, 1) + circle(add(b, [-1, 4]), 2.6, K, 1);
+      }
+      return o;
+    };
+
+    const sideish = view === 'side' || view === 'three';
+    // legs: far first
+    parts.legs += leg(r.hL, r.kL, r.fL, -1);
+    const nearLeg = leg(r.hR, r.kR, r.fR, 1);
+    if (sideish) parts.legs += nearLeg; else parts.legs += nearLeg;
+    // pelvis
+    const pelvisW = (VIEW[view].bw - 1) * r.sc;
+    if (bot.t === 'pants' || bot.t === 'shorts' || bot.t === 'dhoti') {
+      parts.legs += poly([add(add(r.H, r.perp, -pelvisW), r.up, 4), add(add(r.H, r.perp, pelvisW), r.up, 4), add(add(r.H, r.perp, pelvisW * 0.8), r.up, -6), add(add(r.H, r.perp, -pelvisW * 0.8), r.up, -6)], bot.c);
+    }
+    // skirts
+    if (bot.t === 'skirt' || bot.t === 'saree' || bot.t === 'long') {
+      const len = bot.t === 'skirt' ? r.L.thigh * 1.1 : r.L.thigh + r.L.shin - 6;
+      const kneeMid = [(r.kL[0] + r.kR[0]) / 2, (r.kL[1] + r.kR[1]) / 2];
+      const dir = [kneeMid[0] - r.H[0], kneeMid[1] - r.H[1]];
+      const dl = Math.hypot(dir[0], dir[1]) || 1;
+      const u = [dir[0] / dl, dir[1] / dl], pp = [-u[1], u[0]];
+      const spread = Math.max(Math.abs(r.fL[0] - r.fR[0]) / 2 + 6, bot.t === 'skirt' ? 18 : 15) * (kid ? 0.7 : 1);
+      const bL = add(add(r.H, u, len), pp, spread), bR = add(add(r.H, u, len), pp, -spread);
+      parts.legs += poly([add(r.H, pp, pelvisW + 1), add(r.H, pp, -pelvisW - 1), bR, bL], bot.c);
+      if (bot.t === 'saree') parts.legs += `<path d="M${P(add(r.H, pp, -2))}L${P(add(add(r.H, u, len), pp, -spread * 0.3))} M${P(add(r.H, pp, 3))}L${P(add(add(r.H, u, len), pp, spread * 0.25))}" stroke="${K}" stroke-width="1.2" fill="none"/>`;
+    }
+    // torso
+    const tw = VIEW[view].tw * r.sc, bw = VIEW[view].bw * r.sc;
+    const fwd = view === 'side' ? 1.5 : 0;
+    const kurtaLen = (f.sleeve === 'kurta' || f.kurta) ? (kid ? 14 : 26) : 0;
+    const tp = [
+      add(add(r.sb, r.perp, -tw + fwd), r.up, 3), add(add(r.sb, r.perp, tw + fwd), r.up, 3),
+      add(add(r.H, r.perp, bw + fwd + kurtaLen * 0.25), r.up, -3 - kurtaLen), add(add(r.H, r.perp, -bw + fwd - kurtaLen * 0.25), r.up, -3 - kurtaLen),
+    ];
+    parts.torso += limb([r.neck, add(r.neck, r.up, 6)], kid ? 5 : 6, skin);
+    parts.torso += poly(tp, top);
+    if (bot.t === 'saree') {
+      // pallu across the torso
+      parts.torso += poly([add(tp[0], r.perp, 2), add(add(r.sb, r.perp, -tw * 0.2), r.up, 3), add(tp[2], r.up, 4), add(tp[2], r.up, -2)], bot.c === 'k' ? 'hatch' : bot.c);
+    }
+    if (f.vneck && view !== 'back') parts.torso += `<path d="M${P(add(add(r.sb, r.perp, -4), r.up, 2))}L${P(add(r.sb, r.up, -6))}L${P(add(add(r.sb, r.perp, 4), r.up, 2))}" stroke="${top === 'k' ? W : K}" stroke-width="1.6" fill="none"/>`;
+    if (f.pocket && view === 'front') parts.torso += `<rect x="${f2(r.sb[0] + 3)}" y="${f2(r.sb[1] + 9)}" width="6" height="6" fill="none" stroke="${top === 'k' ? W : K}" stroke-width="1.4"/>`;
+    if (f.buttons) parts.torso += `<path d="M${P(add(r.sb, r.up, -2))}L${P(add(r.H, r.up, -2))}" stroke="${top === 'k' ? W : K}" stroke-width="1.3"/>`;
+    if (f.tie && view !== 'back') parts.torso += poly([add(r.sb, r.perp, -2), add(r.sb, r.perp, 2), add(add(r.sb, r.up, -24), r.perp, 2.5), add(r.sb, r.up, -28), add(add(r.sb, r.up, -24), r.perp, -2.5)], K);
+
+    // arms
+    const armL = arm(r.sL, r.eL, r.wL, -1), armR = arm(r.sR, r.eR, r.wR, 1);
+    if (view === 'side' || view === 'three') { parts.far += armL; parts.near += armR; }
+    else { parts.near += armL + armR; }
+    const hd = drawHead(f, r);
+    parts.head = hd.front;
+
+    // props
+    for (const pr of (f.props || [])) {
+      const o = PROPS[pr.t] ? PROPS[pr.t](r, pr, f) : '';
+      if (pr.layer === 'back') parts.backProps += o; else parts.front += o;
+    }
+    const body = parts.backProps + hd.back + parts.far + parts.legs + parts.torso + parts.near + parts.head + parts.front;
+    // ground: lowest point of feet (or seat)
+    const lows = [r.fL[1] + 5, r.fR[1] + 5];
+    if (f.seat) lows.push(r.H[1] + f.seat);
+    if (f.skates) lows.push(r.fL[1] + 13, r.fR[1] + 13);
+    const gy = f.ground != null ? f.ground : Math.max(...lows);
+    const sc = (f.s || 1);
+    const tf = `translate(${f2(f.x || 0)},${f2(-(gy) * sc + (f.y || 0))}) scale(${f.flip ? -sc : sc},${sc})${f.rot ? ` rotate(${f.rot})` : ''}`;
+    return `<g transform="${tf}">${body}</g>`;
+  }
+
+  /* ---------- props held by figures ---------- */
+  const hand = (r, which) => which === 'L' ? r.wL : r.wR;
+  const PROPS = {
+    phone: (r, p) => { const h = hand(r, p.h || 'R'); return `<rect x="${f2(h[0] - 3)}" y="${f2(h[1] - 9)}" width="6.5" height="10" rx="1.4" fill="${K}" transform="rotate(${p.rot || -10} ${f2(h[0])} ${f2(h[1])})"/>`; },
+    book: (r, p) => {
+      const a = r.wL, b = r.wR; const c = p.h ? hand(r, p.h) : [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - 3];
+      return `<g transform="translate(${f2(c[0])},${f2(c[1])}) rotate(${p.rot || 0})"><path d="M0,0 L-11,-3 L-11,9 L0,12Z M0,0 L11,-3 L11,9 L0,12Z" fill="${W}" stroke="${K}" stroke-width="1.8" stroke-linejoin="round"/><path d="M-8,1 l5,1 M-8,4 l5,1 M3,2 l5,-1 M3,5 l5,-1" stroke="${K}" stroke-width="0.9"/></g>`;
+    },
+    closedbook: (r, p) => { const h = hand(r, p.h || 'R'); return `<rect x="${f2(h[0] - 5)}" y="${f2(h[1] - 12)}" width="10" height="14" fill="${p.c === 'w' ? W : K}" stroke="${K}" stroke-width="1.8" transform="rotate(${p.rot || 8} ${f2(h[0])} ${f2(h[1])})"/>`; },
+    plate: (r, p) => { const h = hand(r, p.h || 'L'); return `<g transform="translate(${f2(h[0])},${f2(h[1] - 3)})"><path d="M-6,-3 q2,-4 5,-2 q2,-4 5,0 q3,-1 3,2Z" fill="${K}"/><ellipse cx="0" cy="0" rx="10" ry="3.2" fill="${W}" stroke="${K}" stroke-width="1.8"/></g>`; },
+    cup: (r, p) => { const h = hand(r, p.h || 'R'); return `<path d="M${f2(h[0] - 3.5)},${f2(h[1] - 9)} L${f2(h[0] + 3.5)},${f2(h[1] - 9)} L${f2(h[0] + 2.5)},${f2(h[1] + 1)} L${f2(h[0] - 2.5)},${f2(h[1] + 1)}Z" fill="${W}" stroke="${K}" stroke-width="1.6"/>`; },
+    corn: (r, p) => { const h = hand(r, p.h || 'R'); return `<g transform="rotate(${p.rot || -20} ${f2(h[0])} ${f2(h[1])})"><path d="M${f2(h[0] - 3)},${f2(h[1] - 2)} L${f2(h[0])},${f2(h[1] - 20)} L${f2(h[0] + 3)},${f2(h[1] - 2)}Z" fill="url(#pt-dots)" stroke="${K}" stroke-width="1.6"/></g>`; },
+    bat: (r, p) => { const h = hand(r, 'R'); const e = seg(h, 46, p.a ?? 150); const m = seg(h, 12, p.a ?? 150); return `<path d="M${P(h)}L${P(m)}" stroke="${K}" stroke-width="3" stroke-linecap="round"/><path d="M${P(m)}L${P(e)}" stroke="${K}" stroke-width="9" stroke-linecap="round"/><path d="M${P(m)}L${P(e)}" stroke="${W}" stroke-width="4.5" stroke-linecap="round"/>`; },
+    stick: (r, p) => { const h = hand(r, p.h || 'R'); return `<path d="M${P(add(h, [-3, -2]))}Q${f2(h[0])},${f2(h[1] - 5)} ${f2(h[0] + 1)},${f2(h[1])} L${f2(h[0] + (p.dx || 4))},${f2(r.fR[1] + 5)}" stroke="${K}" stroke-width="2.8" fill="none" stroke-linecap="round"/>`; },
+    bag: (r, p) => { const h = hand(r, p.h || 'L'); return `<path d="M${f2(h[0] - 4)},${f2(h[1] + 6)} Q${f2(h[0])},${f2(h[1] - 4)} ${f2(h[0] + 4)},${f2(h[1] + 6)}" stroke="${K}" stroke-width="1.6" fill="none"/><rect x="${f2(h[0] - 8)}" y="${f2(h[1] + 5)}" width="16" height="17" fill="${p.c === 'k' ? K : W}" stroke="${K}" stroke-width="1.8"/>${p.books ? `<path d="M${f2(h[0] - 6)},${f2(h[1] + 5)} l2,-6 h4 l-1,6 M${f2(h[0] + 1)},${f2(h[1] + 5)} l1,-7 h4 l0,7" fill="${W}" stroke="${K}" stroke-width="1.4"/>` : ''}`; },
+    backpack: (r, p) => { const c = add(add(r.sb, r.up, -16), r.perp, -9 * r.sc); return `<rect x="${f2(c[0] - 7 * r.sc)}" y="${f2(c[1] - 12 * r.sc)}" width="${f2(13 * r.sc)}" height="${f2(24 * r.sc)}" rx="3" fill="${p.c === 'w' ? W : K}" stroke="${K}" stroke-width="1.8"/>`; },
+    camera: (r, p) => { const c = add(r.head, [9, 3]); return `<rect x="${f2(c[0] - 6)}" y="${f2(c[1] - 5)}" width="13" height="9" rx="1.5" fill="${K}"/><circle cx="${f2(c[0] + 8)}" cy="${f2(c[1] - 0.5)}" r="3.4" fill="${W}" stroke="${K}" stroke-width="1.8"/>`; },
+    plant: (r, p) => {
+      const a = r.wL, b = r.wR; const c = p.h ? hand(r, p.h) : [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      return `<g transform="translate(${f2(c[0])},${f2(c[1])})"><path d="M-2,-12 q-12,-14 -4,-24 q5,8 4,24 M1,-12 q4,-20 14,-22 q0,14 -14,22 M0,-12 q-2,-12 2,-20" fill="${W}" stroke="${K}" stroke-width="1.7" stroke-linejoin="round"/><path d="M-8,-12 L8,-12 L6,4 L-6,4Z" fill="${K}" stroke="${K}" stroke-width="1.6"/></g>`;
+    },
+    mic: (r, p) => { const h = hand(r, p.h || 'R'); return `<path d="M${P(h)}L${P(add(h, [3, -9]))}" stroke="${K}" stroke-width="3.2" stroke-linecap="round"/><circle cx="${f2(h[0] + 4)}" cy="${f2(h[1] - 11)}" r="3.4" fill="${K}"/>`; },
+    placard: (r, p) => {
+      const h = hand(r, p.h || 'R'); const top = add(h, [p.dx || 0, -46]);
+      const lines = (p.text || '').length ? `<text x="${f2(top[0])}" y="${f2(top[1] - 6)}" font-family="'Patrick Hand','Comic Sans MS',cursive" font-size="${p.fs || 9}" text-anchor="middle" fill="${K}">${p.text}</text>` : '';
+      return `<path d="M${P(add(h, [0, 6]))}L${P(top)}" stroke="${K}" stroke-width="2.6"/><rect x="${f2(top[0] - (p.w || 30) / 2)}" y="${f2(top[1] - 22)}" width="${p.w || 30}" height="22" fill="${W}" stroke="${K}" stroke-width="2"/>${lines}`;
+    },
+    flag: (r, p) => { const h = hand(r, p.h || 'R'); const top = add(h, [0, -40]); return `<path d="M${P(h)}L${P(top)}" stroke="${K}" stroke-width="2.2"/><path d="M${P(top)} q10,-3 20,1 q-2,6 0,13 q-10,-4 -20,-1Z" fill="url(#pt-stripe)" stroke="${K}" stroke-width="1.8"/>`; },
+    leash: (r, p) => { const h = hand(r, p.h || 'R'); return `<path d="M${P(h)} Q${f2((h[0] + p.to[0]) / 2)},${f2(Math.max(h[1], p.to[1]) + 14)} ${f2(p.to[0])},${f2(p.to[1])}" stroke="${K}" stroke-width="1.5" fill="none"/>`; },
+    kettle: (r, p) => { const h = hand(r, p.h || 'L'); return `<g transform="translate(${f2(h[0])},${f2(h[1] + 4)})"><path d="M-8,0 Q-9,14 0,14 Q9,14 8,0Z" fill="${W}" stroke="${K}" stroke-width="1.8"/><path d="M-5,0 Q0,-9 5,0" stroke="${K}" stroke-width="1.6" fill="none"/><path d="M8,4 l7,-5" stroke="${K}" stroke-width="2.4" stroke-linecap="round"/></g>`; },
+    guitar: (r, p) => { const c = add(r.H, [10, -12]); return `<g transform="translate(${f2(c[0])},${f2(c[1])}) rotate(-30)"><path d="M-6,-2 h40" stroke="${K}" stroke-width="4"/><circle cx="-8" cy="-2" r="9.5" fill="${W}" stroke="${K}" stroke-width="2"/><circle cx="-16" cy="-2" r="8" fill="${W}" stroke="${K}" stroke-width="2"/><circle cx="-8" cy="-2" r="2.6" fill="${K}"/><path d="M-18,-2 h18" stroke="${K}" stroke-width="2"/></g>`; },
+    laptop: (r, p) => { const c = p.at || add(r.H, [14, -8]); return `<g transform="translate(${f2(c[0])},${f2(c[1])})"><path d="M-12,0 L12,0 L14,3 L-14,3Z" fill="${K}"/><path d="M-11,0 L-7,-16 L13,-16 L10,0Z" fill="${W}" stroke="${K}" stroke-width="1.8" stroke-linejoin="round"/></g>`; },
+    speech: (r, p) => { const c = add(r.head, [p.dx || 10, -22]); return `<path d="M${f2(c[0])},${f2(c[1])} l4,-8 M${f2(c[0] + 7)},${f2(c[1] + 2)} l8,-6 M${f2(c[0] + 9)},${f2(c[1] + 9)} l9,-1" stroke="${K}" stroke-width="2" stroke-linecap="round"/>`; },
+    lead: (r, p) => '',
+  };
+
+  /* ---------- free-standing things on the ground (y=0 is ground) ---------- */
+  const ENTS = {
+    bench: (e) => {
+      const x = e.x, w = e.w || 90, h = 40;
+      return `<g>${line([x + 8, -h], [x + 6, 0], 3.2)}${line([x + w - 8, -h], [x + w - 6, 0], 3.2)}${line([x + 10, -h - 26], [x + 10, -h], 3)}${line([x + w - 10, -h - 26], [x + w - 10, -h], 3)}
+        <rect x="${x}" y="${-h - 4}" width="${w}" height="6" fill="${W}" stroke="${K}" stroke-width="2.2"/>
+        <rect x="${x + 4}" y="${-h - 30}" width="${w - 8}" height="5" fill="${W}" stroke="${K}" stroke-width="2"/><rect x="${x + 4}" y="${-h - 20}" width="${w - 8}" height="5" fill="${W}" stroke="${K}" stroke-width="2"/></g>`;
+    },
+    mat: (e) => `<path d="M${e.x},-1 L${e.x + e.w},-1 L${e.x + e.w + 8},5 L${e.x - 8},5Z" fill="${e.c === 'k' ? K : 'url(#pt-stripe)'}" stroke="${K}" stroke-width="2" stroke-linejoin="round"/>`,
+    picnic: (e) => `<path d="M${e.x},-2 L${e.x + e.w},-2 L${e.x + e.w + 14},6 L${e.x - 14},6Z" fill="url(#pt-check)" stroke="${K}" stroke-width="2" stroke-linejoin="round"/>`,
+    basket: (e) => `<g transform="translate(${e.x},0)"><path d="M-12,-18 Q0,-34 12,-18" stroke="${K}" stroke-width="2.4" fill="none"/><path d="M-14,-18 L14,-18 L11,0 L-11,0Z" fill="url(#pt-check)" stroke="${K}" stroke-width="2.2"/></g>`,
+    dog: (e) => {
+      const s = e.s || 1, fl = e.flip ? -1 : 1, c = e.c === 'k' ? K : W;
+      const sit = e.sit;
+      const body = sit
+        ? `<path d="M-14,-4 Q-18,-24 -2,-30 Q10,-32 10,-20 L8,0 L-16,0Z" fill="${c}" stroke="${K}" stroke-width="2.2" stroke-linejoin="round"/>${line([6, -14], [8, 0], 4)}<path d="M-16,-4 q-10,0 -10,-8" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>`
+        : `${line([-14, -14], [-16, 0], 4)}${line([-6, -14], [-4, 0], 4)}${line([8, -14], [6, 0], 4)}${line([14, -14], [16, 0], 4)}<path d="M-20,-24 Q-20,-12 -12,-11 L14,-11 Q20,-14 18,-24 Q0,-28 -20,-24Z" fill="${c}" stroke="${K}" stroke-width="2.2" stroke-linejoin="round"/><path d="M-20,-22 q-8,-4 -9,-14" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      const hx = sit ? 10 : 18, hy = sit ? -36 : -32;
+      const head = `<g transform="translate(${hx},${hy}) rotate(${e.down ? 30 : 0})"><path d="M-6,-6 Q4,-11 9,-4 L15,-2 Q16,4 10,5 L-2,6 Q-8,2 -6,-6Z" fill="${c}" stroke="${K}" stroke-width="2.2" stroke-linejoin="round"/><circle cx="14.5" cy="-1.5" r="1.8" fill="${K}"/><circle cx="5" cy="-3" r="1.3" fill="${c === K ? W : K}"/><path d="M-3,-6 q-3,8 2,12 q3,-6 1,-12Z" fill="${K}"/></g>`;
+      const spots = c === W && e.spots ? `<circle cx="-4" cy="-21" r="4" fill="${K}"/><circle cx="7" cy="-18" r="3" fill="${K}"/>` : '';
+      return `<g transform="translate(${e.x},0) scale(${fl * s},${s})">${body}${spots}${head}</g>`;
+    },
+    bowl: (e) => `<g transform="translate(${e.x},0)"><path d="M-10,-7 Q-9,0 0,0 Q9,0 10,-7Z" fill="${W}" stroke="${K}" stroke-width="2"/><path d="M-7,-7 q3,-4 7,-2 q4,-3 7,2" fill="${K}"/></g>`,
+    stumps: (e) => `<g transform="translate(${e.x},0)">${[-6, 0, 6].map(x => line([x, -48], [x, 0], 2.6)).join('')}${line([-7, -49], [7, -49], 2.2)}</g>`,
+    ball: (e) => e.type === 'basket'
+      ? `<g transform="translate(${e.x},${e.y})"><circle r="8" fill="${W}" stroke="${K}" stroke-width="2"/><path d="M-8,0 H8 M0,-8 V8 M-5,-6 Q0,0 -5,6 M5,-6 Q0,0 5,6" stroke="${K}" stroke-width="1.3" fill="none"/></g>`
+      : `<g transform="translate(${e.x},${e.y})"><circle r="4" fill="${K}"/><path d="M-1,-4 q2,4 0,8" stroke="${W}" stroke-width="1" fill="none"/></g>`,
+    cart: (e) => {
+      const x = e.x;
+      return `<g transform="translate(${x},0)">${line([-30, -46], [-30, -96], 2.4)}${line([30, -46], [30, -96], 2.4)}<path d="M-42,-96 Q0,-118 42,-96Z" fill="url(#pt-vstripe)" stroke="${K}" stroke-width="2.2"/>
+        <rect x="-36" y="-50" width="72" height="36" fill="${W}" stroke="${K}" stroke-width="2.2"/><path d="M-36,-40 H36" stroke="${K}" stroke-width="1.6"/>
+        ${[-26, -14, -2, 10, 22].map(cx => `<circle cx="${cx + 4}" cy="-56" r="4.5" fill="${W}" stroke="${K}" stroke-width="1.6"/>`).join('')}
+        <text x="0" y="-22" font-family="'Patrick Hand','Comic Sans MS',cursive" font-size="10" text-anchor="middle" fill="${K}">${e.label || 'CHAAT'}</text>
+        <circle cx="-22" cy="-7" r="7" fill="${W}" stroke="${K}" stroke-width="2.2"/><circle cx="22" cy="-7" r="7" fill="${W}" stroke="${K}" stroke-width="2.2"/><circle cx="-22" cy="-7" r="1.6" fill="${K}"/><circle cx="22" cy="-7" r="1.6" fill="${K}"/></g>`;
+    },
+    cycle: (e) => {
+      const x = e.x;
+      return `<g transform="translate(${x},0)"><circle cx="-24" cy="-14" r="14" fill="none" stroke="${K}" stroke-width="2.4"/><circle cx="24" cy="-14" r="14" fill="none" stroke="${K}" stroke-width="2.4"/>
+        <path d="M-24,-14 L-6,-14 L6,-38 L-12,-38 L-24,-14 M-6,-14 L-14,-44 M6,-38 L24,-14 M6,-38 L4,-48 L12,-50" stroke="${K}" stroke-width="2.4" fill="none" stroke-linejoin="round"/><path d="M-20,-44 h10" stroke="${K}" stroke-width="4" stroke-linecap="round"/>
+        <rect x="-44" y="-58" width="26" height="22" fill="${W}" stroke="${K}" stroke-width="2"/><path d="M-40,-62 Q-31,-74 -22,-62" stroke="${K}" stroke-width="1.8" fill="none"/>
+        <path d="M-38,-58 l0,-6 l8,0 l0,6 M-28,-58 l0,-8 l7,0 l0,8" fill="${W}" stroke="${K}" stroke-width="1.6"/></g>`;
+    },
+    swing: (e) => `<g transform="translate(${e.x},0)">${line([-50, 0], [-36, -130], 3)}${line([-22, 0], [-36, -130], 3)}${line([50, 0], [36, -130], 3)}${line([22, 0], [36, -130], 3)}${line([-38, -130], [38, -130], 4)}${line([-14, -128], [-14, -50], 1.4)}${line([14, -128], [14, -50], 1.4)}<rect x="-18" y="-51" width="36" height="5" fill="${K}"/></g>`,
+    gym: (e) => `<g transform="translate(${e.x},0)">${line([-20, 0], [-20, -110], 4)}${line([20, 0], [20, -110], 4)}${line([-24, -110], [24, -110], 4)}<circle cx="0" cy="-74" r="18" fill="none" stroke="${K}" stroke-width="3"/>${line([0, -74], [14, -86], 3)}<circle cx="14" cy="-86" r="3" fill="${K}"/><circle cx="0" cy="-74" r="3" fill="${K}"/><path d="M-30,0 H30" stroke="${K}" stroke-width="3"/></g>`,
+    harmonium: (e) => `<g transform="translate(${e.x},0)"><rect x="-22" y="-26" width="44" height="26" fill="${W}" stroke="${K}" stroke-width="2.2"/><path d="M-22,-26 L-16,-34 L28,-34 L22,-26" fill="${W}" stroke="${K}" stroke-width="2"/><path d="M-18,-12 h40" stroke="${K}" stroke-width="1.4"/>${Array.from({ length: 8 }, (_, i) => `<rect x="${-14 + i * 5}" y="-33" width="2.4" height="5" fill="${K}"/>`).join('')}<path d="M22,-26 v26" stroke="${K}" stroke-width="2"/><path d="M-20,-20 h-8 M-20,-8 h-8" stroke="${K}" stroke-width="1.4"/></g>`,
+    podium: (e) => `<g transform="translate(${e.x},0)"><path d="M-22,-70 L22,-70 L16,0 L-16,0Z" fill="${W}" stroke="${K}" stroke-width="2.4" stroke-linejoin="round"/><path d="M-26,-74 L26,-74 L22,-68 L-22,-68Z" fill="${K}"/><text x="0" y="-36" font-family="'Patrick Hand','Comic Sans MS',cursive" font-size="9" text-anchor="middle" fill="${K}">${e.label || ''}</text>${line([8, -74], [4, -96], 2)}<circle cx="3" cy="-98" r="3" fill="${K}"/></g>`,
+    leaves: (e) => `<g transform="translate(${e.x},0)">${[[-10, -3, 20], [6, -2, -30], [18, -4, 60]].map(([x, y, a]) => `<path d="M${x},${y} q5,-6 10,0 q-5,6 -10,0Z" fill="${W}" stroke="${K}" stroke-width="1.5" transform="rotate(${a} ${x + 5} ${y})"/>`).join('')}</g>`,
+    crow: (e) => `<g transform="translate(${e.x},${e.y || 0}) scale(${e.flip ? -1 : 1},1)"><path d="M-12,-6 Q-6,-18 6,-16 L14,-20 L12,-14 Q10,-4 -2,-4 L-16,0Z" fill="${K}"/><path d="M14,-20 l6,2 l-6,1" fill="${K}"/><circle cx="10" cy="-17" r="1" fill="${W}"/>${line([-1, -4], [-2, 2], 1.4)}${line([3, -4], [4, 2], 1.4)}</g>`,
+    lamp: (e) => `<g transform="translate(${e.x},0)">${line([0, 0], [0, -120], 3.4)}<path d="M-9,-120 L9,-120 L6,-136 L-6,-136Z" fill="${W}" stroke="${K}" stroke-width="2"/><path d="M-12,0 h24" stroke="${K}" stroke-width="3"/></g>`,
+    pot: (e) => `<g transform="translate(${e.x},0)"><path d="M-2,-14 q-10,-12 -4,-22 q5,8 4,22 M1,-14 q4,-18 12,-20 q0,12 -12,20" fill="${W}" stroke="${K}" stroke-width="1.6"/><path d="M-8,-14 L8,-14 L6,0 L-6,0Z" fill="${K}"/></g>`,
+    slide: (e) => `<g transform="translate(${e.x},0)">${line([-30, 0], [-30, -90], 3)}${line([-14, 0], [-14, -90], 3)}${[-70, -50, -30].map(y => line([-30, y], [-14, y], 2.4)).join('')}<path d="M-14,-90 L-34,-90" stroke="${K}" stroke-width="3"/><path d="M-14,-88 Q20,-60 46,-6 L52,-2" stroke="${K}" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M-14,-88 Q20,-60 46,-6 L52,-2" stroke="${W}" stroke-width="4" fill="none" stroke-linecap="round"/></g>`,
+    hoop: (e) => `<g transform="translate(${e.x},0)">${line([0, 0], [0, -190], 4)}<rect x="-30" y="-214" width="34" height="26" fill="${W}" stroke="${K}" stroke-width="2.4"/><rect x="-20" y="-206" width="14" height="10" fill="none" stroke="${K}" stroke-width="1.6"/><ellipse cx="-20" cy="-188" rx="10" ry="3" fill="none" stroke="${K}" stroke-width="2.2"/><path d="M-29,-188 l3,12 M-20,-185 l0,12 M-11,-188 l-3,12 M-27,-180 l14,0" stroke="${K}" stroke-width="1" fill="none"/></g>`,
+  };
+
+  /* ---------- torn notebook paper ---------- */
+  function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function tornRect(x, y, w, h, rnd, opts = {}) {
+    const pts = [];
+    const edge = (ax, ay, bx, by, rough, nx, ny) => {
+      const len = Math.hypot(bx - ax, by - ay), n = Math.max(4, Math.round(len / 7));
+      for (let i = 0; i < n; i++) {
+        const t = i / n, j = rough ? (rnd() * rough) : 0;
+        pts.push([ax + (bx - ax) * t + nx * j, ay + (by - ay) * t + ny * j]);
+      }
+    };
+    edge(x, y, x + w, y, opts.top ?? 3.5, 0, 1);
+    edge(x + w, y, x + w, y + h, opts.right ?? 4.5, -1, 0);
+    edge(x + w, y + h, x, y + h, opts.bottom ?? 5, 0, -1);
+    edge(x, y + h, x, y, opts.left ?? 2, 1, 0);
+    return 'M' + pts.map(P).join('L') + 'Z';
+  }
+
+  function renderCutout(scene, seed) {
+    const rnd = mulberry(seed || 7);
+    const inner = (scene.ents || []).filter(e => e.layer === 'back').map(e => ENTS[e.t](e)).join('') +
+      (scene.figs || []).map(figure).join('') +
+      (scene.ents || []).filter(e => e.layer !== 'back').map(e => ENTS[e.t](e)).join('');
+    return { inner, rnd };
+  }
+
+  // Render to an <svg>, measure, then wrap content with torn paper sized to it.
+  function mountCutout(el, scene, seed, unitPx) {
+    const { inner, rnd } = renderCutout(scene, seed);
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('class', 'cutout-svg');
+    svg.innerHTML = `<g class="ink">${inner}</g>`;
+    el.appendChild(svg);
+    let bb;
+    try { bb = svg.querySelector('.ink').getBBox(); } catch (e) { bb = { x: -60, y: -200, width: 120, height: 200 }; }
+    const padX = 26, padTop = 30, padB = 22;
+    const x = bb.x - padX, y = bb.y - padTop, w = bb.width + padX * 2, h = bb.height + padTop + padB;
+    const holes = Array.from({ length: Math.floor(h / 22) }, (_, i) => `<circle cx="${f2(x + 1)}" cy="${f2(y + 14 + i * 22)}" r="3.4" fill="var(--tear-bg, transparent)"/>`).join('');
+    const pid = 'pp' + seed;
+    const paper = `<defs><clipPath id="${pid}"><path d="${tornRect(x, y, w, h, rnd, { left: 1.5 })}"/></clipPath>
+      <filter id="rough${seed}" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="${seed}" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.5  0 0 0 0 0.4  0 0 0 -0.9 0.62" result="tint"/><feComposite in="tint" in2="SourceGraphic" operator="in"/></filter></defs>
+      <g class="paper">
+        <path d="${tornRect(x, y, w, h, mulberry(seed), { left: 1.5 })}" fill="#f7f3e8"/>
+        <g clip-path="url(#${pid})">
+          ${Array.from({ length: Math.ceil(h / 16) }, (_, i) => `<path d="M${f2(x)},${f2(y + 26 + i * 16)} H${f2(x + w)}" stroke="#9db1c4" stroke-opacity=".55" stroke-width="0.9"/>`).join('')}
+          <path d="M${f2(x + 22)},${f2(y)} V${f2(y + h)}" stroke="#d98b84" stroke-opacity=".6" stroke-width="1"/>
+          <rect x="${f2(x)}" y="${f2(y)}" width="${f2(w)}" height="${f2(h)}" fill="#000" filter="url(#rough${seed})" opacity=".35"/>
+        </g>
+        ${holes}
+      </g>`;
+    svg.innerHTML = paper + `<g class="ink">${inner}</g>` + `<path class="tape" d="M${f2(x + w / 2 - 26)},${f2(y - 8)} l52,-3 l2,18 l-52,3Z" fill="#efe2bf" fill-opacity=".85" stroke="#d8c9a3" stroke-width=".6"/>`;
+    svg.setAttribute('viewBox', `${f2(x - 4)} ${f2(y - 14)} ${f2(w + 8)} ${f2(h + 18)}`);
+    svg.dataset.w = w + 8; svg.dataset.h = h + 18;
+    sizeCutout(svg, unitPx);
+    return svg;
+  }
+  function sizeCutout(svg, unitPx) {
+    svg.style.width = (svg.dataset.w * unitPx) + 'px';
+    svg.style.height = (svg.dataset.h * unitPx) + 'px';
+  }
+
+  const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <pattern id="pt-stripe" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="${W}"/><rect width="6" height="2.6" fill="${K}"/></pattern>
+    <pattern id="pt-vstripe" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${W}"/><rect width="4" height="8" fill="${K}"/></pattern>
+    <pattern id="pt-dots" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="${K}"/><circle cx="1.5" cy="1.5" r="0.9" fill="${W}"/><circle cx="4.5" cy="4.5" r="0.9" fill="${W}"/></pattern>
+    <pattern id="pt-check" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${W}"/><rect width="4" height="4" fill="${K}"/><rect x="4" y="4" width="4" height="4" fill="${K}"/></pattern>
+    <pattern id="pt-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="${W}"/><rect width="1.8" height="5" fill="${K}"/></pattern>
+  </defs></svg>`;
+
+  window.Cutouts = { mountCutout, sizeCutout, DEFS, POSES };
+})();
+</script>
+<script>/* Parks, cards and the cast for each card.
+   To use a real field photo on a card, add  photo: 'img/your-file.jpg'  to that card. */
+window.PARKS = [
+  {
+    "id": "cubbon",
+    "name": "Cubbon Park",
+    "img": "img/photo-cubbon.jpg",
+    "credit": "Photo: Pavan Praneeth / Unsplash",
+    "blurb": "The best-known park in the city centre, around the red State Central Library. On weekends it hosts music, flash mobs, street theatre, book clubs and poetry readings under its trees.",
+    "cards": [
+      {
+        "title": "Out with the dog",
+        "caption": "If it feels nice to stretch your legs after a long day at work with a walk, imagine how fun an open park is for dogs with limited space in apartments.",
+        "crop": "30% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": 0,
+              "view": "side",
+              "pose": "walk",
+              "top": "stripe",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "short",
+              "glasses": true,
+              "tweak": {
+                "aR": [
+                  40,
+                  50
+                ]
+              },
+              "props": [
+                {
+                  "t": "leash",
+                  "h": "R",
+                  "to": [
+                    104,
+                    56
+                  ]
+                }
+              ]
+            }
+          ],
+          "ents": [
+            {
+              "t": "dog",
+              "x": 86,
+              "spots": true
+            }
+          ]
+        },
+        "art": "img/cut/dog-walker.webp",
+        "photo": "img/card/dog-walker.jpg",
+        "photoPos": "40% 65%"
+      },
+      {
+        "title": "Yoga on the lawn",
+        "caption": "“Good morning. I just learnt a new Yogasana. Let’s try?”",
+        "crop": "80% 80%",
+        "scene": {
+          "figs": [
+            {
+              "x": 0,
+              "view": "front",
+              "pose": "tree",
+              "top": "k",
+              "sleeve": "none",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "bun",
+              "barefoot": true
+            },
+            {
+              "x": 110,
+              "view": "front",
+              "pose": "stretch",
+              "top": "w",
+              "bottom": {
+                "t": "shorts",
+                "c": "k"
+              },
+              "hair": "bald",
+              "beard": true,
+              "flip": true
+            }
+          ],
+          "ents": [
+            {
+              "t": "mat",
+              "x": -36,
+              "w": 72,
+              "layer": "back"
+            }
+          ]
+        },
+        "art": "img/cut/yoga.webp",
+        "photo": "img/card/yoga.jpg",
+        "photoPos": "40% 60%"
+      },
+      {
+        "title": "Open mic",
+        "caption": "Come one, come all. It’s an open mic. It’s your chance to shine. It’s time for entertainment in the wild.",
+        "crop": "62% 40%",
+        "scene": {
+          "figs": [
+            {
+              "x": -80,
+              "view": "front",
+              "pose": "sitCrossBook",
+              "top": "stripe",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "bun",
+              "glasses": true,
+              "props": [
+                {
+                  "t": "book"
+                }
+              ]
+            },
+            {
+              "x": 0,
+              "view": "front",
+              "pose": "guitar",
+              "top": "k",
+              "bottom": {
+                "t": "pants",
+                "c": "w"
+              },
+              "hair": "long",
+              "props": [
+                {
+                  "t": "guitar"
+                }
+              ]
+            },
+            {
+              "x": 95,
+              "view": "three",
+              "flip": true,
+              "pose": "hold",
+              "top": "w",
+              "sleeve": "kurta",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "curly",
+              "mouth": "open",
+              "props": [
+                {
+                  "t": "book"
+                }
+              ]
+            }
+          ]
+        },
+        "art": "img/cut/open-mic.webp",
+        "photo": "img/card/open-mic.jpg",
+        "photoPos": "50% 50%"
+      }
+    ]
+  },
+  {
+    "id": "lalbagh",
+    "name": "Lalbagh Botanical Garden",
+    "img": "img/photo-lalbagh.jpg",
+    "credit": "By Abhiman Singh - Glass House Botanical Garden Lal Bagh Bangalore, CC0, https://commons.wikimedia.org/wiki/Special:Redirect/page/87479838",
+    "blurb": "We went during Independence Week, when crowds were larger than usual and a paid Flower Show was on. Lalbagh doubles as a tourist attraction, with its lake, the Glass House and around 1,800 plant species.",
+    "cards": [
+      {
+        "title": "Joggers",
+        "caption": "Staying fit, one round around the greens at a time.",
+        "crop": "20% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": -70,
+              "view": "side",
+              "pose": "walk",
+              "top": "w",
+              "sleeve": "kurta",
+              "bottom": {
+                "t": "dhoti",
+                "c": "w"
+              },
+              "hair": "white",
+              "moustache": "w"
+            },
+            {
+              "x": 50,
+              "view": "side",
+              "pose": "run",
+              "top": "k",
+              "sleeve": "none",
+              "bottom": {
+                "t": "shorts",
+                "c": "w"
+              },
+              "cap": "w",
+              "hair": "short"
+            }
+          ]
+        },
+        "art": "img/cut/joggers.webp",
+        "photo": "img/card/joggers.jpg",
+        "photoPos": "50% 55%"
+      },
+      {
+        "title": "Children on the grass",
+        "caption": "Amidst the rising technology and declining greenery around the globe, a sight where two kids spend time lying on the grass, enjoying each other’s company, is a sight to behold.",
+        "crop": "15% 90%",
+        "scene": {
+          "figs": [
+            {
+              "x": -74,
+              "kid": true,
+              "view": "front",
+              "pose": "armsUp",
+              "top": "stripe",
+              "bottom": {
+                "t": "shorts",
+                "c": "k"
+              },
+              "hair": "curly",
+              "rot": 90,
+              "ground": 0,
+              "y": -14,
+              "mouth": "open"
+            },
+            {
+              "x": 74,
+              "kid": true,
+              "view": "front",
+              "pose": "armsUp",
+              "top": "w",
+              "bottom": {
+                "t": "skirt",
+                "c": "k"
+              },
+              "hair": "pony",
+              "rot": -90,
+              "ground": 0,
+              "y": -14,
+              "mouth": "open"
+            }
+          ]
+        },
+        "art": "img/cut/children-grass.webp",
+        "photo": "img/card/children-grass.jpg",
+        "photoPos": "40% 70%"
+      },
+      {
+        "title": "Buying plants",
+        "caption": "No better place to get houseplants than from the source. Talk about authenticity!",
+        "crop": "50% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": -60,
+              "view": "three",
+              "pose": "stand",
+              "top": "vstripe",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "short",
+              "beard": true,
+              "props": [
+                {
+                  "t": "bag",
+                  "h": "L"
+                }
+              ]
+            },
+            {
+              "x": 40,
+              "view": "side",
+              "pose": "holdSide",
+              "top": "w",
+              "sleeve": "kurta",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "long",
+              "props": [
+                {
+                  "t": "plant",
+                  "h": "R"
+                }
+              ]
+            }
+          ],
+          "ents": [
+            {
+              "t": "pot",
+              "x": 110
+            },
+            {
+              "t": "pot",
+              "x": 132
+            },
+            {
+              "t": "pot",
+              "x": 121,
+              "layer": "back"
+            }
+          ]
+        },
+        "art": "img/cut/buying-plants.webp",
+        "photo": "img/card/buying-plants.jpg",
+        "photoPos": "35% 50%"
+      },
+      {
+        "title": "Food stalls",
+        "caption": "Parks as a third space become even more prevalent when affordable, easy-to-grab, and delicious food is added to the equation.",
+        "crop": "50% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": 0,
+              "view": "front",
+              "pose": "eat",
+              "top": "w",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "curly",
+              "props": [
+                {
+                  "t": "corn",
+                  "h": "R"
+                }
+              ]
+            },
+            {
+              "x": 80,
+              "view": "three",
+              "flip": true,
+              "pose": "eat",
+              "top": "k",
+              "bottom": {
+                "t": "long",
+                "c": "w"
+              },
+              "hair": "scarf",
+              "props": [
+                {
+                  "t": "cup",
+                  "h": "R"
+                }
+              ]
+            }
+          ],
+          "ents": [
+            {
+              "t": "cart",
+              "x": -100,
+              "label": "BHUTTA",
+              "layer": "back"
+            }
+          ]
+        },
+        "art": "img/cut/food-stalls.webp",
+        "photo": "img/card/food-stalls.jpg",
+        "photoPos": "50% 55%"
+      },
+      {
+        "title": "Tourists",
+        "caption": "For the Garden City of India, there is no doubt that a garden as large as Lalbagh becomes a spot on the itinerary for tourists.",
+        "crop": "50% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": 0,
+              "view": "three",
+              "pose": "camera",
+              "top": "stripe",
+              "bottom": {
+                "t": "shorts",
+                "c": "k"
+              },
+              "hat": true,
+              "props": [
+                {
+                  "t": "camera"
+                },
+                {
+                  "t": "backpack",
+                  "layer": "back"
+                }
+              ]
+            },
+            {
+              "x": 120,
+              "view": "three",
+              "flip": true,
+              "pose": "point",
+              "top": "w",
+              "bottom": {
+                "t": "shorts",
+                "c": "w"
+              },
+              "hair": "pony",
+              "shades": true,
+              "tweak": {
+                "aR": [
+                  80,
+                  85
+                ]
+              }
+            }
+          ]
+        },
+        "art": "img/cut/tourists.webp",
+        "photo": "img/card/tourists.jpg",
+        "photoPos": "45% 45%"
+      }
+    ]
+  },
+  {
+    "id": "dollars",
+    "name": "Dollars Colony Park",
+    "img": "img/photo-dollars.jpg",
+    "credit": "Photo: Group 4",
+    "blurb": "A quiet residential park used mostly by locals for a walk or a stroll. It is cleaner than the others we saw, with bins along the walkways.",
+    "cards": [
+      {
+        "title": "A little jam session",
+        "caption": "Fundamentals of a park: community. Fun in a park: a little jam session.",
+        "crop": "30% 55%",
+        "scene": {
+          "figs": [
+            {
+              "x": -70,
+              "view": "front",
+              "pose": "sitCross",
+              "top": "w",
+              "sleeve": "kurta",
+              "bottom": {
+                "t": "pants",
+                "c": "w"
+              },
+              "hair": "bald",
+              "moustache": true,
+              "glasses": true,
+              "tweak": {
+                "aL": [
+                  20,
+                  110
+                ],
+                "aR": [
+                  -20,
+                  -110
+                ]
+              }
+            },
+            {
+              "x": 50,
+              "view": "front",
+              "pose": "sing",
+              "top": "w",
+              "bottom": {
+                "t": "saree",
+                "c": "stripe"
+              },
+              "hair": "braid",
+              "bindi": true,
+              "mouth": "open",
+              "props": [
+                {
+                  "t": "mic",
+                  "h": "R"
+                }
+              ]
+            }
+          ],
+          "ents": [
+            {
+              "t": "harmonium",
+              "x": -70
+            }
+          ]
+        },
+        "art": "img/cut/jam-session.webp",
+        "photo": "img/card/jam-session.jpg",
+        "photoPos": "50% 55%"
+      }
+    ]
+  },
+  {
+    "id": "sahakar",
+    "name": "Sahakar Nagar",
+    "img": "img/photo-sahakar.jpg",
+    "blurb": "A cluster of neighbourhood parks in North Bengaluru, each with its own use: a kids’ playground, a skating park, a basketball court, open fields and an open gym. Entry is free and weekends are busiest, but most of the people here are older.",
+    "cards": [
+      {
+        "title": "Skating class",
+        "caption": "Parks are more than just a place to hang out. It can be a learning opportunity. Skating classes in Sahakarnagar are one such example.",
+        "crop": "50% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": -70,
+              "view": "three",
+              "pose": "armsCross",
+              "top": "k",
+              "bottom": {
+                "t": "pants",
+                "c": "w"
+              },
+              "hair": "pony"
+            },
+            {
+              "x": 30,
+              "kid": true,
+              "view": "side",
+              "pose": "skate",
+              "top": "stripe",
+              "bottom": {
+                "t": "shorts",
+                "c": "k"
+              },
+              "hair": "short",
+              "helmet": true,
+              "skates": true
+            }
+          ]
+        },
+        "art": "img/cut/skating.webp",
+        "photo": "img/card/skating.jpg",
+        "photoPos": "50% 70%"
+      },
+      {
+        "title": "Cricket",
+        "caption": "The first dream of a kid in action.",
+        "crop": "50% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": 0,
+              "view": "side",
+              "pose": "bat",
+              "top": "w",
+              "bottom": {
+                "t": "pants",
+                "c": "w"
+              },
+              "cap": "k",
+              "props": [
+                {
+                  "t": "bat",
+                  "a": 155
+                }
+              ]
+            },
+            {
+              "x": 170,
+              "view": "side",
+              "flip": true,
+              "pose": "run",
+              "top": "k",
+              "sleeve": "short",
+              "bottom": {
+                "t": "pants",
+                "c": "w"
+              },
+              "hair": "curly"
+            }
+          ],
+          "ents": [
+            {
+              "t": "stumps",
+              "x": -34,
+              "layer": "back"
+            },
+            {
+              "t": "ball",
+              "x": 104,
+              "y": -96
+            }
+          ]
+        },
+        "art": "img/cut/cricket.webp",
+        "photo": "img/card/cricket.jpg",
+        "photoPos": "62% 55%"
+      },
+      {
+        "title": "Basketball",
+        "caption": "Do you remember your school’s Games hour? Do you want to recreate it?",
+        "crop": "50% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": 0,
+              "view": "side",
+              "pose": "shoot",
+              "top": "k",
+              "sleeve": "none",
+              "bottom": {
+                "t": "shorts",
+                "c": "w"
+              },
+              "hair": "short"
+            }
+          ],
+          "ents": [
+            {
+              "t": "hoop",
+              "x": 112,
+              "layer": "back"
+            },
+            {
+              "t": "ball",
+              "type": "basket",
+              "x": 16,
+              "y": -250
+            }
+          ]
+        },
+        "art": "img/cut/basketball.webp",
+        "photo": "img/card/basketball.jpg",
+        "photoPos": "30% 60%"
+      },
+      {
+        "title": "The open gym",
+        "caption": "Some can’t afford the luxury of a gym—either financially or physically. Parks give you the solution to that as well, proving once again their inclusivity.",
+        "crop": "50% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": -80,
+              "view": "side",
+              "pose": "walk",
+              "top": "w",
+              "bottom": {
+                "t": "saree",
+                "c": "hatch"
+              },
+              "hair": "whitebun",
+              "glasses": true
+            },
+            {
+              "x": 30,
+              "view": "front",
+              "pose": "stretch",
+              "top": "w",
+              "sleeve": "kurta",
+              "bottom": {
+                "t": "pants",
+                "c": "w"
+              },
+              "hair": "white",
+              "glasses": true,
+              "moustache": "w"
+            }
+          ],
+          "ents": [
+            {
+              "t": "gym",
+              "x": 120,
+              "layer": "back"
+            }
+          ]
+        },
+        "art": "img/cut/open-gym.webp",
+        "photo": "img/card/open-gym.jpg",
+        "photoPos": "50% 60%"
+      },
+      {
+        "title": "Slides and swings",
+        "caption": "Let’s go back to the roots. The first thing that you imagine in a park is the kids taking turns on the swings and slides. It is fun packed in one ride.",
+        "crop": "50% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": -100,
+              "view": "back",
+              "pose": "hips",
+              "top": "k",
+              "bottom": {
+                "t": "long",
+                "c": "w"
+              },
+              "hair": "long"
+            },
+            {
+              "x": 0,
+              "kid": true,
+              "view": "front",
+              "pose": "swingSit",
+              "top": "w",
+              "bottom": {
+                "t": "skirt",
+                "c": "k"
+              },
+              "hair": "pony",
+              "ground": 0,
+              "y": -48,
+              "mouth": "open"
+            },
+            {
+              "x": 130,
+              "kid": true,
+              "view": "front",
+              "pose": "jump",
+              "top": "k",
+              "bottom": {
+                "t": "shorts",
+                "c": "w"
+              },
+              "hair": "curly",
+              "mouth": "open"
+            }
+          ],
+          "ents": [
+            {
+              "t": "swing",
+              "x": 0,
+              "layer": "back"
+            }
+          ]
+        },
+        "art": "img/cut/slides-swings.webp",
+        "photo": "img/card/slides-swings.jpg",
+        "photoPos": "50% 72%"
+      }
+    ],
+    "credit": "Photo: Group 4"
+  },
+  {
+    "id": "jp",
+    "name": "JP Park",
+    "img": "img/photo-jp.jpg",
+    "credit": "Source: bangaloretourism (https://bangaloretourism.in/jp-park-bangalore)",
+    "blurb": "A large park with a lake and walking paths. On our visit much of it was empty.",
+    "cards": [
+      {
+        "title": "Group study",
+        "caption": "Where do you go to catch up on study material you missed when you took that week-long break? To nature’s retreat. With work on the grass.",
+        "crop": "30% 85%",
+        "scene": {
+          "figs": [
+            {
+              "x": -70,
+              "view": "front",
+              "pose": "sitCrossBook",
+              "top": "k",
+              "bottom": {
+                "t": "pants",
+                "c": "w"
+              },
+              "hair": "pony",
+              "props": [
+                {
+                  "t": "book"
+                }
+              ]
+            },
+            {
+              "x": 10,
+              "view": "front",
+              "pose": "sitCross",
+              "top": "stripe",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "short",
+              "glasses": true,
+              "tweak": {
+                "aL": [
+                  30,
+                  80
+                ],
+                "aR": [
+                  -30,
+                  -80
+                ]
+              },
+              "props": [
+                {
+                  "t": "laptop",
+                  "at": [
+                    0,
+                    -6
+                  ]
+                }
+              ]
+            },
+            {
+              "x": 90,
+              "view": "three",
+              "flip": true,
+              "pose": "sitKnees",
+              "top": "w",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "curly",
+              "seat": 8,
+              "props": [
+                {
+                  "t": "closedbook",
+                  "h": "R"
+                }
+              ]
+            }
+          ]
+        },
+        "art": "img/cut/group-study.webp",
+        "photo": "img/card/group-study.jpg",
+        "photoPos": "40% 60%"
+      },
+      {
+        "title": "After school",
+        "caption": "Where do you wind down after a long day of teachers, notes, and new learnings? For these students, it is JP Park.",
+        "crop": "80% 75%",
+        "scene": {
+          "figs": [
+            {
+              "x": 0,
+              "kid": true,
+              "view": "side",
+              "pose": "walk",
+              "top": "w",
+              "bottom": {
+                "t": "shorts",
+                "c": "k"
+              },
+              "hair": "short",
+              "tie": true,
+              "props": [
+                {
+                  "t": "backpack",
+                  "layer": "back"
+                }
+              ]
+            },
+            {
+              "x": 55,
+              "kid": true,
+              "view": "side",
+              "pose": "walk2",
+              "top": "w",
+              "bottom": {
+                "t": "skirt",
+                "c": "k"
+              },
+              "hair": "braid",
+              "tie": true,
+              "props": [
+                {
+                  "t": "backpack",
+                  "layer": "back",
+                  "c": "w"
+                }
+              ]
+            }
+          ]
+        },
+        "art": "img/cut/after-school.webp",
+        "photo": "img/card/after-school.jpg",
+        "photoPos": "45% 70%"
+      },
+      {
+        "title": "Family picnic",
+        "caption": "A little time away from home to enjoy the joyful moments only a Sunday afternoon can bring. Parks become the hosts of these moments.",
+        "crop": "20% 70%",
+        "scene": {
+          "figs": [
+            {
+              "x": -60,
+              "view": "front",
+              "pose": "sitCross",
+              "top": "w",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "long",
+              "bindi": true
+            },
+            {
+              "x": 0,
+              "kid": true,
+              "view": "front",
+              "pose": "wave",
+              "top": "stripe",
+              "bottom": {
+                "t": "shorts",
+                "c": "k"
+              },
+              "hair": "curly",
+              "mouth": "open"
+            },
+            {
+              "x": 70,
+              "view": "three",
+              "flip": true,
+              "pose": "sitKnees",
+              "top": "k",
+              "bottom": {
+                "t": "pants",
+                "c": "w"
+              },
+              "hair": "short",
+              "beard": true,
+              "seat": 8
+            }
+          ],
+          "ents": [
+            {
+              "t": "picnic",
+              "x": -90,
+              "w": 190,
+              "layer": "back"
+            },
+            {
+              "t": "basket",
+              "x": 120
+            }
+          ]
+        },
+        "art": "img/cut/family-picnic.webp",
+        "photo": "img/card/family-picnic.jpg",
+        "photoPos": "45% 62%"
+      }
+    ]
+  },
+  {
+    "id": "freedom",
+    "name": "Freedom Park",
+    "img": "img/photo-freedom.jpg",
+    "credit": "By Diham - Own work, CC BY 3.0, https://commons.wikimedia.org/wiki/Special:Redirect/page/7745023",
+    "blurb": "Built on the grounds of Bangalore’s old Central Jail, Freedom Park is now where protests in the city are allowed to take place. It has also hosted the Bangalore Literature Festival.",
+    "cards": [
+      {
+        "title": "Protest",
+        "caption": "Resistance. Community. A space to be heard.",
+        "crop": "35% 45%",
+        "scene": {
+          "figs": [
+            {
+              "x": -80,
+              "view": "three",
+              "pose": "shout",
+              "top": "k",
+              "bottom": {
+                "t": "pants",
+                "c": "w"
+              },
+              "hair": "short",
+              "beard": true,
+              "mouth": "open",
+              "props": [
+                {
+                  "t": "placard",
+                  "h": "L",
+                  "text": "HEAR US",
+                  "w": 44
+                }
+              ]
+            },
+            {
+              "x": 10,
+              "view": "front",
+              "pose": "fist",
+              "top": "w",
+              "sleeve": "kurta",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "scarfK",
+              "mouth": "open"
+            },
+            {
+              "x": 100,
+              "view": "three",
+              "flip": true,
+              "pose": "hold",
+              "top": "stripe",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "pony",
+              "tweak": {
+                "aR": [
+                  -150,
+                  -170
+                ]
+              },
+              "props": [
+                {
+                  "t": "flag",
+                  "h": "R"
+                }
+              ]
+            }
+          ]
+        },
+        "art": "img/cut/protest.webp",
+        "photo": "img/card/protest.jpg",
+        "photoPos": "50% 45%"
+      },
+      {
+        "title": "Bangalore Literature Festival",
+        "caption": "Writers, readers, and a lot of opinions. Freedom Park has hosted the Bangalore Literature Festival, where ideas are shared out loud and anyone can pull up a chair.",
+        "crop": "62% 70%",
+        "scene": {
+          "figs": [
+            {
+              "x": 0,
+              "view": "front",
+              "pose": "gesture2",
+              "top": "k",
+              "sleeve": "long",
+              "bottom": {
+                "t": "pants",
+                "c": "k"
+              },
+              "hair": "white",
+              "glasses": true,
+              "mouth": "open"
+            },
+            {
+              "x": 110,
+              "view": "three",
+              "flip": true,
+              "pose": "hold",
+              "top": "w",
+              "bottom": {
+                "t": "long",
+                "c": "k"
+              },
+              "hair": "bun",
+              "tweak": {
+                "aR": [
+                  -20,
+                  -120
+                ]
+              },
+              "props": [
+                {
+                  "t": "bag",
+                  "h": "L",
+                  "books": true
+                },
+                {
+                  "t": "closedbook",
+                  "h": "R",
+                  "c": "w"
+                }
+              ]
+            }
+          ],
+          "ents": [
+            {
+              "t": "podium",
+              "x": 0,
+              "label": "BLF"
+            }
+          ]
+        },
+        "art": "img/cut/lit-fest.webp",
+        "photo": "img/card/lit-fest.jpg",
+        "photoPos": "50% 62%"
+      }
+    ]
+  }
+];
+</script>
+<script>
+(function(){
+  document.body.insertAdjacentHTML('afterbegin', Cutouts.DEFS);
+  const $ = (s, el=document) => el.querySelector(s);
+  const clamp = (v, a=0, b=1) => Math.max(a, Math.min(b, v));
+  const ease = t => t * t * (3 - 2 * t);                 // smoothstep
+  const easeIO = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* group popover */
+  const gb = $('#groupBtn'), gp = $('#groupPop');
+  const closePop = () => { gp.classList.remove('open'); gb.setAttribute('aria-expanded', false); };
+  gb.addEventListener('click', e => { e.stopPropagation(); const o = !gp.classList.contains('open'); gp.classList.toggle('open', o); gb.setAttribute('aria-expanded', o); });
+  document.addEventListener('click', e => { if (!gp.contains(e.target)) closePop(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePop(); });
+
+  /* intro: one screen of scroll per slide */
+  const PER = 0.62;          // screens of scroll per text slide
+  const fades = [...document.querySelectorAll('.fade-sec')].map(sec => {
+    const slides = [...sec.querySelectorAll('.slide')];
+    sec.style.height = (slides.length * PER + 1) * 100 + 'svh';
+    return { sec, slides, parts: slides.map(s => [...s.children]), count: $('.intro-count', sec), bar: $('.intro-bar', sec), top: 0, h: 0 };
+  });
+
+  /* parks */
+  const host = $('#parks');
+  const unit = () => {
+    const vh = innerHeight, vw = innerWidth;
+    return vw < 760 ? Math.min(vh * 0.0016, vw * 0.0042) : vh * 0.00188;
+  };
+  const PU = 0.58;          // screens of scroll per card
+  let seed = 3;
+  const parks = PARKS.map((p, pi) => {
+    const n = p.cards.length;
+    const sec = document.createElement('section');
+    sec.className = 'park'; sec.id = 'park-' + p.id;
+    sec.style.height = ((n + 2) * PU + 1) * 100 + 'svh';
+    sec.innerHTML = `
+      <div class="stage">
+        <div class="bg" style="background-image:url(${p.img})" aria-hidden="true"></div>
+        <div class="park-title">
+          <p class="eyebrow">Park ${String(pi + 1).padStart(2, '0')} of ${String(PARKS.length).padStart(2, '0')}</p>
+          <h2>${p.name}</h2>
+          <p>${p.blurb}</p>
+          <p class="hint">Scroll to meet the people ↓</p>
+        </div>
+        <div class="park-label" aria-hidden="true">${p.name}</div>
+        <div class="cut-zone"></div>
+        <div class="card-zone">
+          ${p.cards.map((c, i) => `
+            <article class="card" aria-hidden="true">
+              <div class="ph" style="${c.photo ? '' : `background-image:url(${p.img});background-position:${c.crop || '50% 70%'}`}">${c.photo ? `<img src="${c.photo}" alt="${c.title}" loading="lazy" style="object-position:${c.photoPos || '50% 50%'}">` : ''}</div>
+              <div class="meta"><span>${p.name}</span><span>${i + 1} / ${n}</span></div>
+              <h3>${c.title}</h3>
+              <p>${c.caption}</p>
+            </article>`).join('')}
+        </div>
+        ${p.credit ? `<p class="credit">${p.credit}</p>` : ''}
+        <div class="dots" aria-hidden="true">${p.cards.map(() => '<i></i>').join('')}</div>
+        <div class="veil" aria-hidden="true"></div>
+      </div>`;
+    host.appendChild(sec);
+    const zone = $('.cut-zone', sec);
+    const cuts = p.cards.map((c, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'cut';
+      wrap.style.setProperty('--r', ((seed * 37 % 7) - 3) * 0.9 + 'deg');
+      wrap.setAttribute('role', 'img');
+      wrap.setAttribute('aria-label', 'Paper cut-out: ' + c.title);
+      zone.appendChild(wrap);
+      if (c.art) {
+        const img = new Image(); img.src = c.art; img.alt = ''; img.className = 'cut-img'; img.decoding = 'async';
+        wrap.appendChild(img); seed++;
+        return { wrap, img };
+      }
+      const svg = Cutouts.mountCutout(wrap, c.scene, seed++, unit());
+      return { wrap, svg };
+    });
+    const pk = { p, n, sec, bg: $('.bg', sec), veil: $('.veil', sec), title: $('.park-title', sec), label: $('.park-label', sec), credit: $('.credit', sec), h2: $('.park-title h2', sec),
+             cards: [...sec.querySelectorAll('.card')], dots: [...sec.querySelectorAll('.dots i')], dotsWrap: $('.dots', sec), cuts, top: 0, h: 0, dot: -2 };
+    toneLabel(pk);
+    return pk;
+  });
+
+  /* label colour follows the picture behind it: dark text on light areas, light text on dark */
+  function toneLabel(pk) {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas'); c.width = 64; c.height = 36;
+        const x = c.getContext('2d'); x.drawImage(img, 0, 0, 64, 36);
+        const d = x.getImageData(0, 0, 26, 7).data; let L = 0;
+        for (let i = 0; i < d.length; i += 4) L += (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255;
+        pk.label.classList.toggle('on-light', L / (d.length / 4) > 0.6);
+      } catch (e) {}
+    };
+    img.src = pk.p.img;
+  }
+
+  function fitCuts() {
+    const u = unit(), maxW = innerWidth < 760 ? innerWidth * 0.92 : innerWidth * 0.5;
+    parks.forEach(pk => pk.cuts.forEach(({ svg }) => { if (svg) Cutouts.sizeCutout(svg, Math.min(u, maxW / svg.dataset.w)); }));
+  }
+  function measure() {
+    const sy = scrollY;
+    fades.forEach(f => { f.top = f.sec.getBoundingClientRect().top + sy; f.h = f.sec.offsetHeight; });
+    parks.forEach(pk => { pk.top = pk.sec.getBoundingClientRect().top + sy; pk.h = pk.sec.offsetHeight; });
+  }
+  function fitTitles() {
+    parks.forEach(pk => {
+      pk.h2.style.fontSize = '';
+      const avail = pk.title.clientWidth, need = pk.h2.scrollWidth;
+      if (need > avail) pk.h2.style.fontSize = (parseFloat(getComputedStyle(pk.h2).fontSize) * avail / need * 0.98).toFixed(1) + 'px';
+    });
+  }
+  fitCuts(); fitTitles(); measure();
+
+  const heroBg = $('.hero-bg');
+  function render(y) {
+    const vh = innerHeight;
+    if (!reduce && y < vh * 1.2) heroBg.style.transform = `translate3d(0,${(y * 0.22).toFixed(1)}px,0)`;
+
+    /* intro: each slide eases in, holds, eases out; its lines follow a beat apart */
+    for (const f of fades) {
+    if (y < f.top - vh * 1.2 || y > f.top + f.h + vh * 0.2) continue;
+    const p = clamp((y - f.top) / (f.h - vh));
+    const N = f.slides.length, pos = p * N;
+    f.slides.forEach((s, i) => {
+      const t = pos - i;
+      let vis = false;
+      f.parts[i].forEach((el, j) => {
+        const tj = t - j * 0.03;
+        let o = 0;
+        if (tj > 0 && tj < 1) o = Math.min(clamp(tj / 0.3), clamp((1 - tj) / 0.3));
+        const dy = (0.5 - tj) * 70;
+        el.style.opacity = o.toFixed(3);
+        el.style.transform = `translate3d(0,${dy.toFixed(1)}px,0)`;
+        el.style.filter = o < 0.999 ? `blur(${((1 - o) * 4).toFixed(2)}px)` : 'none';
+        if (o > 0.001) vis = true;
+      });
+      s.style.visibility = vis ? 'visible' : 'hidden';
+    });
+    f.count.textContent = `${String(clamp(Math.floor(pos), 0, N - 1) + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`;
+    f.bar.style.width = (p * 100).toFixed(2) + '%';
+    }
+
+    /* parks */
+    for (const pk of parks) {
+      const rel = y - pk.top;
+      if (rel < -vh * 1.2 || rel > pk.h + vh * 0.2) continue;
+      const u = (rel / (pk.h - vh)) * (pk.n + 2);
+      const veil = u <= 0.55 ? 1 : u < 1.1 ? 1 - (u - 0.55) / 0.55 : u > pk.n + 1.4 ? clamp((u - (pk.n + 1.4)) / 0.6) : 0;
+      pk.veil.style.opacity = veil.toFixed(3);
+      if (!reduce) pk.bg.style.transform = `scale(${(1 + 0.06 * (1 - clamp((u - 0.55) / 0.9))).toFixed(4)})`;
+      const tOp = Math.min(clamp(u / 0.3), clamp((0.78 - u) / 0.25));
+      pk.title.style.opacity = tOp.toFixed(3);
+      pk.title.style.transform = `translate3d(0,${((0.4 - u) * 60).toFixed(1)}px,0)`;
+      pk.title.style.visibility = tOp > 0.001 ? 'visible' : 'hidden';
+      const lOp = (1 - veil);
+      pk.label.style.opacity = lOp.toFixed(3);
+      pk.dotsWrap.style.opacity = lOp.toFixed(3);
+      if (pk.credit) pk.credit.style.opacity = (lOp * 0.9).toFixed(3);
+
+      /* cards travel up together like a conveyor; cut-outs cross-fade with them */
+      for (let i = 0; i < pk.n; i++) {
+        const d = u - (i + 1.5);               // 0 = card i centred
+        const ad = Math.abs(d);
+        const yv = -d * vh * 0.7;             // steady drift: same speed all the way through
+        const card = pk.cards[i], cop = 1 - clamp((ad - 0.3) / 0.4);
+        card.style.setProperty('--y', yv.toFixed(1) + 'px');
+        card.style.opacity = cop.toFixed(3);
+        card.style.visibility = cop > 0.001 ? 'visible' : 'hidden';
+        card.setAttribute('aria-hidden', Math.abs(d) <= 0.5 ? 'false' : 'true');
+        const co = 1 - clamp((ad - 0.25) / 0.25);
+        const cw = pk.cuts[i].wrap;
+        cw.style.opacity = co.toFixed(3);
+        cw.style.setProperty('--cy', (d * 30).toFixed(1) + 'px');
+        cw.style.visibility = co > 0.001 ? 'visible' : 'hidden';
+      }
+      const dot = clamp(Math.round(u - 1.5), 0, pk.n - 1);
+      if (dot !== pk.dot) { pk.dots.forEach((e, i) => e.classList.toggle('on', i === dot)); pk.dot = dot; }
+    }
+  }
+
+  /* eased scroll: the page follows the real scroll position a little behind, so nothing jumps */
+  let cur = scrollY, tgt = scrollY, last = 0, running = false;
+  function frame(now) {
+    const dt = last ? Math.min(64, now - last) : 16.7; last = now;
+    const k = reduce ? 1 : 1 - Math.pow(1 - 0.24, dt / 16.7);
+    cur += (tgt - cur) * k;
+    if (Math.abs(tgt - cur) < 0.4) cur = tgt;
+    render(cur);
+    if (cur !== tgt) requestAnimationFrame(frame); else { running = false; last = 0; }
+  }
+  const kick = () => { tgt = scrollY; if (!running) { running = true; requestAnimationFrame(frame); } };
+  addEventListener('scroll', kick, { passive: true });
+  addEventListener('resize', () => { fitCuts(); fitTitles(); measure(); cur = tgt = scrollY; render(cur); });
+  addEventListener('load', () => { measure(); render(cur); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitTitles(); measure(); render(cur); });
+  render(cur);
+
+  const endSec = $('#end');
+  const endObs = new IntersectionObserver((es) => es.forEach(e => {
+    if (!e.isIntersecting || endSec.classList.contains('on')) return;
+    endSec.classList.add('on');
+    const lis = endSec.querySelectorAll('li');
+    lis.forEach(li => {
+      li.addEventListener('animationend', ev => { if (ev.animationName === 'rise') li.classList.add('shown'); });
+      li.addEventListener('pointerenter', () => li.classList.add('shown'));
+      li.addEventListener('focus', () => li.classList.add('shown'));
+    });
+    setTimeout(() => lis.forEach(li => li.classList.add('shown')), reduce ? 0 : 4200);
+  }), { threshold: 0.35 });
+  endObs.observe(endSec);
+})();
+</script>
+</body>
+</html>
